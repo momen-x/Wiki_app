@@ -1,9 +1,9 @@
 import Image from "next/image";
-import cloude from "./images/cloud&host.png"
+import cloude from "./images/cloud&host.png";
 
 export default function Home() {
   return (
-   <div className="w-full max-w-7xl mx-auto px-4">
+    <div className="w-full max-w-7xl mx-auto px-4">
       <div className="flex justify-between items-center min-h-[calc(100vh-150px)] gap-8">
         <div className="flex-1">
           <h5 className="text-2xl font-bold mb-4">Cloud Hosting</h5>
@@ -12,26 +12,26 @@ export default function Home() {
           </p>
           <div className="space-y-2">
             <p className="flex items-center gap-2">
-              <span >✔</span>
+              <span>✔</span>
               Easy To Use Control Panel
             </p>
             <p className="flex items-center gap-2">
-              <span >✔</span>
+              <span>✔</span>
               Secure Hosting
             </p>
             <p className="flex items-center gap-2">
-              <span >✔</span>
+              <span>✔</span>
               Website Maintenance
             </p>
           </div>
         </div>
-        
+
         <div className="flex-shrink-0">
-          <Image 
-            src={cloude} 
-            alt="cloud hosting photo" 
-            width={250} 
-            height={300}  
+          <Image
+            src={cloude}
+            alt="cloud hosting photo"
+            width={250}
+            height={300}
             className="rounded-2xl"
           />
         </div>

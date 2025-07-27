@@ -10,3 +10,17 @@ export interface ILogin {
   email: string;
   password: string;
 }
+
+export interface IEditUserData {
+  email?: string;
+  password?: string;
+  username?: string;
+}
+
+export interface ICreateComment {
+  text: string;
+  articleId: number;
+}
+export interface IEditComment{
+  text:string;
+}

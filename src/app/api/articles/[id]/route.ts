@@ -6,10 +6,9 @@ interface Iprops {
   params: { id: string };
 }
 import { IEditArticle } from "@/app/utils/SchemaDto";
-import { title } from "process";
 /**
  *@method GEt
- * @route ~/api/article/:id
+ * @route ~/api/articles/:id
  * @desc Display single article
  * @access public
  */
@@ -32,7 +31,7 @@ export async function GET(request: NextRequest, { params }: Iprops) {
 }
 /**
  *@method PUT
- * @route ~/api/article/:id
+ * @route ~/api/articles/:id
  * @desc Edit  article
  * @access private
  */
@@ -71,7 +70,7 @@ export async function PUT(request: NextRequest, { params }: Iprops) {
 
 /**
  *@method DELETE
- * @route ~/api/article/:id
+ * @route ~/api/articles/:id
  * @desc Delete article
  * @access private
  */
@@ -81,7 +80,24 @@ export async function DELETE(request: NextRequest, { params }: Iprops) {
     if (isNaN(id)) {
       return NextResponse.json("this article is not exist", { status: 404 });
     }
-    const article = await prisma.article.delete({ where: { id } });
+const article = await prisma.article.findUnique({
+  where: { id },
+  include: { comments: true },
+});
+
+if (!article) {
+  return NextResponse.json("this article is not exist", { status: 404 });
+}
+
+const commentIds: number[] = article.comments.map(comment => comment.id);
+
+if (commentIds.length > 0) {
+  await prisma.comment.deleteMany({ where: { id: { in: commentIds } } });
+}
+
+await prisma.article.delete({
+  where: { id }
+});
 
     return NextResponse.json(article, { status: 200 });
   } catch (error) {
