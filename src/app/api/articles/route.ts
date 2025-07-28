@@ -3,10 +3,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/app/utils/db";
 import { createArticleSchema } from "@/app/utils/SchemaDto";
 import { verifyToken } from "@/app/utils/verifyToken";
+import { Article_In_All_Page } from "../../utils/CountOfArticleInPage";
 
 interface IArticleDto {
   title: string;
   description: string;
+  userId: number;
 }
 /**
  * @method GET
@@ -14,9 +16,15 @@ interface IArticleDto {
  * @description Display all articles
  * @access public
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    let pageNumber: any = request.nextUrl.searchParams.get("pageNumber");
+    if (pageNumber === null) {
+      pageNumber = 1;
+    }
     const articles = await prisma.article.findMany({
+      skip: Article_In_All_Page*(pageNumber-1),
+      take: Article_In_All_Page,
       include: {
         user: {
           select: {
@@ -59,6 +67,9 @@ export async function POST(request: NextRequest) {
     }
 
     const body = (await request.json()) as IArticleDto;
+    if (decoded.id !== body.userId) {
+      return NextResponse.json({ message: "Invalid token." }, { status: 401 });
+    }
     const validation = createArticleSchema.safeParse(body);
     if (!validation.success) {
       return NextResponse.json(

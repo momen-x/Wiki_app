@@ -6,7 +6,7 @@ import CardContent from "@mui/material/CardContent";
 const card = (
   <>
     <Typography variant="h4" component={"h2"}>
-      Log in
+      Registerd
     </Typography>
     <CardContent>
       <RegisterInputs></RegisterInputs>

@@ -1,6 +1,5 @@
 "use client"
 import { Box, Button, TextField, Typography } from "@mui/material"
-import { title } from "process"
 import {useState} from "react"
 const ArticleInputs = () => {
     const [articleInput,setArticaleInput]=useState({title:"",body:""})
@@ -26,7 +25,6 @@ const ArticleInputs = () => {
           label="body"
           multiline
           rows={4}
-        //   defaultValue="Default Value"
           variant="outlined"
         />
         <Button variant="contained">Add</Button>

@@ -3,18 +3,35 @@ import NotFound from "../not-found";
 import Link from "next/link";
 import AddCommentInputs from "@/app/components/AddCommentInputs";
 import ListOfComments from "@/app/components/ListOfComments";
+import { domin_name } from "@/app/utils/DOMIN";
+import { cookies } from "next/headers";
+import { verifyTokenForPage } from "@/app/utils/verifyToken";
 
 interface IParams {
   params: { id: string };
+}
+interface IComments {
+  id: number;
+  updatedAt: Date;
+  text: string;
+  user: { username: string };
+  userId: number;
 }
 interface IArticleType {
   userId: number;
   id: number;
   title: string;
-  body: string;
+  description: string;
+  updatedAt: Date;
+  comments: IComments[];
 }
 
 const DynamicPage = async ({ params }: IParams) => {
+  const cookieStore = cookies();
+  const token = cookieStore.get("token"); // Read a cookie
+  const payload = verifyTokenForPage(token?.value);
+
+  let userId = false;
   const id = params.id;
 
   if (isNaN(+id) || +id <= 0) {
@@ -22,9 +39,7 @@ const DynamicPage = async ({ params }: IParams) => {
   }
 
   try {
-    const response = await fetch(
-      `https://jsonplaceholder.typicode.com/posts/${id}`
-    );
+    const response = await fetch(`${domin_name}/api/articles/${id}`);
 
     if (!response.ok) {
       return <NotFound />;
@@ -32,7 +47,10 @@ const DynamicPage = async ({ params }: IParams) => {
 
     const article: IArticleType = await response.json();
 
-    // If the article is empty, show NotFound
+    if (payload?.id === article.userId) {
+      userId = true;
+    }
+
     if (!article || !article.title) {
       return <NotFound />;
     }
@@ -40,14 +58,24 @@ const DynamicPage = async ({ params }: IParams) => {
     return (
       <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto">
-          {/* Back button */}
           <div className="mb-6">
-            <Link 
-              href="/article" 
+            <Link
+              href="/article"
               className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
             >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              <svg
+                className="w-5 h-5 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
               </svg>
               Back to Articles
             </Link>
@@ -56,16 +84,16 @@ const DynamicPage = async ({ params }: IParams) => {
           {/* Article card */}
           <div className="bg-white shadow-lg rounded-lg overflow-hidden">
             <div className="p-6 sm:p-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">{article.title}</h1>
-              
+              <h1 className="text-3xl font-bold text-gray-900 mb-4">
+                {article.title}
+              </h1>
+
               <div className="flex items-center text-gray-500 mb-6">
-                <span className="mr-4">Posted by User {article.userId}</span>
-                {/* <span>Article ID: {article.id}</span> */}
+                {/* <span className="mr-4">Posted by User {article.User.}</span> */}
               </div>
-              
+
               <div className="prose max-w-none text-gray-700">
-                <p className="text-lg leading-relaxed">{article.body}</p>
-                <p className="text-lg leading-relaxed mt-4">{article.body}</p> {/* Duplicated for demo */}
+                <p className="text-lg leading-relaxed">{article.description}</p>
               </div>
             </div>
 
@@ -73,27 +101,22 @@ const DynamicPage = async ({ params }: IParams) => {
             <div className="bg-gray-50 px-6 py-4 sm:px-8 border-t border-gray-200">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-500">
-                  Last updated: {new Date().toLocaleDateString()}
+                  Last updated:{" "}
+                  {new Date(article.updatedAt).toLocaleDateString()}
                 </span>
-                <div className="flex space-x-3">
-                  <button className="text-blue-600 hover:text-blue-800 transition-colors">
-                    Share
-                  </button>
-                  <button className="text-blue-600 hover:text-blue-800 transition-colors">
-                    Save
-                  </button>
-                </div>
               </div>
             </div>
           </div>
         </div>
         <div className="w-full mt-4">
           <div className="w-2xl m-auto">
-          <AddCommentInputs/>
-
+            <AddCommentInputs id={id} />
           </div>
           <div className="w-2xl m-auto">
-            <ListOfComments/>
+            <ListOfComments
+              comments={article.comments}
+              userId={payload?.id}
+            />{" "}
           </div>
         </div>
       </div>

@@ -15,7 +15,6 @@ import { CreateCommentDto } from "@/app/utils/SchemaDto";
 export async function POST(request: NextRequest) {
   try {
     const user = verifyToken(request);
-    console.log("================================",user);
     
     if (!user) {
       return NextResponse.json(

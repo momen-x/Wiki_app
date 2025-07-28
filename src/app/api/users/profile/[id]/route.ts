@@ -38,22 +38,22 @@ export async function DELETE(request: NextRequest, { params }: Iprops) {
       process.env.PRIVATE_KEY as string
     ) as JwtPayload;
 
-    if (userFormToken.id === user?.id) {
-      const commentIds: number[] = user.comments.map((c) => c.id);
-      if (commentIds.length > 0) {
-        await prisma.comment.deleteMany({ where: { id: { in: commentIds } } });
-      }
-      const articleIds: number[] = user.articles.map((a) => a.id);
-      if (articleIds.length > 0) {
-        await prisma.comment.deleteMany({ where: { id: { in: articleIds } } });
-      }
+    // if (userFormToken.id === user?.id) {
+    //   const commentIds: number[] = user.comments.map((c) => c.id);
+    //   if (commentIds.length > 0) {
+    //     await prisma.comment.deleteMany({ where: { id: { in: commentIds } } });
+    //   }
+    //   const articleIds: number[] = user.articles.map((a) => a.id);
+    //   if (articleIds.length > 0) {
+    //     await prisma.comment.deleteMany({ where: { id: { in: articleIds } } });
+    //   }
 
-      await prisma.user.delete({ where: { id } });
-      return NextResponse.json(
-        { message: "your acount has been deleted" },
-        { status: 200 }
-      );
-    }
+    //   await prisma.user.delete({ where: { id } });
+    //   return NextResponse.json(
+    //     { message: "your acount has been deleted" },
+    //     { status: 200 }
+    //   );
+    // }
 
     // Authorization: Check if the token user ID matches the profile ID
     if (userFormToken.id !== id) {
@@ -194,8 +194,8 @@ export async function PUT(request: NextRequest, { params }: Iprops) {
       );
     }
 
-    const updateData: Partial<IEditUserData> = { ...body };
     //===========This code from cluade=====================
+    const updateData: Partial<IEditUserData> = { ...body };
     // Only hash password if it's being updated
     if (body.password && body.password.trim() !== "") {
       const salt = await bcrypt.genSalt(10);
@@ -204,6 +204,28 @@ export async function PUT(request: NextRequest, { params }: Iprops) {
       // Remove password from update data if not provided
       delete updateData.password;
     }
+if(body.username&&body.username?.trim()!=="")
+  {
+    const user =await prisma.user.findUnique({where:{username:body.username}});
+    if(user){
+       return NextResponse.json(
+        { message: "this username alreday taken" },
+        { status: 400 }
+      );
+    }
+  }
+if(body.email&&body.email?.trim()!=="")
+  {
+    const user =await prisma.user.findUnique({where:{email:body.email}});
+    if(user){
+       return NextResponse.json(
+        { message: "this email alreday taken" },
+        { status: 400 }
+      );
+    }
+  }
+
+
     //===========This code from cluade=====================
 
     const updatedUser = await prisma.user.update({

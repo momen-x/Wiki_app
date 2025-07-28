@@ -6,7 +6,6 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { serialize } from "cookie";
 
-
 /**
  * @method POST
  * @route ~/api/users/register
@@ -17,7 +16,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as IRegister;
     const validation = RegisterAcount.safeParse(body);
-    
+
     if (!validation.success) {
       return NextResponse.json(
         { message: validation.error.issues[0].message },
@@ -25,14 +24,16 @@ export async function POST(request: NextRequest) {
       );
     }
     const user = await prisma.user.findUnique({ where: { email: body.email } });
-    if (user) {
+    const user1 = await prisma.user.findUnique({
+      where: { username: body.username },
+    });
+    if (user || user1) {
       return NextResponse.json(
         { message: "this user alreday registerd" },
         { status: 400 }
       );
     }
-    
-    
+
     if (body.password !== body.confirmPassword) {
       return NextResponse.json(
         { message: "the password is not matched" },
@@ -66,18 +67,24 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
-    
+
     const token = jwt.sign(jwtPayload, process.env.PRIVATE_KEY);
- const cookie = serialize("token", token, {
+    const cookie = serialize("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       path: "/",
       maxAge: 60 * 60 * 24 * 30, //30 days
     });
-    return NextResponse.json({ user: newUser }, { status: 201, headers: {
+    return NextResponse.json(
+      { user: newUser },
+      {
+        status: 201,
+        headers: {
           "Set-Cookie": cookie,
-        },});
+        },
+      }
+    );
   } catch (error) {
     console.error(error);
     return NextResponse.json(

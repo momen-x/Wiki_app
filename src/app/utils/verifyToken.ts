@@ -1,6 +1,6 @@
-import { JwtPayload } from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { NextRequest } from "next/server";
-import jwt from "jsonwebtoken";
+// import  from "jsonwebtoken";
 
 export function verifyToken(request: NextRequest): JwtPayload | null {
   try {
@@ -14,9 +14,24 @@ export function verifyToken(request: NextRequest): JwtPayload | null {
 
     const privateKey = process.env.PRIVATE_KEY as string;
     const userPayload = jwt.verify(token, privateKey) as JwtPayload;
-    
+
     return userPayload;
   } catch (error) {
+    return null;
+  }
+}
+
+export function verifyTokenForPage(token: string): JwtPayload | null {
+  try {
+    if (!token) return null;
+    const privateKey = process.env.PRIVATE_KEY;
+    if (!privateKey) {
+      return null;
+    }
+    const userPayload = jwt.verify(token, privateKey) as JwtPayload;
+    return userPayload;
+  } catch (error) {
+    console.error("JWT verification failed:", error);
     return null;
   }
 }
