@@ -18,7 +18,19 @@ export async function GET(request: NextRequest, { params }: Iprops) {
     if (isNaN(id)) {
       return NextResponse.json("this article is not exist", { status: 404 });
     }
-    const article = await prisma.article.findUnique({ where: { id: id } });
+    const article = await prisma.article.findUnique({
+      where: { id: id },
+      include: {
+        comments: {
+          orderBy: { createdAt: "desc" },
+          include: {
+            user: {
+              select: { username: true },
+            },
+          },
+        },
+      },
+    });
 
     if (!article) {
       return NextResponse.json("this article is not exist", { status: 404 });
@@ -80,24 +92,24 @@ export async function DELETE(request: NextRequest, { params }: Iprops) {
     if (isNaN(id)) {
       return NextResponse.json("this article is not exist", { status: 404 });
     }
-const article = await prisma.article.findUnique({
-  where: { id },
-  include: { comments: true },
-});
+    const article = await prisma.article.findUnique({
+      where: { id },
+      include: { comments: true },
+    });
 
-if (!article) {
-  return NextResponse.json("this article is not exist", { status: 404 });
-}
+    if (!article) {
+      return NextResponse.json("this article is not exist", { status: 404 });
+    }
 
-const commentIds: number[] = article.comments.map(comment => comment.id);
+    // const commentIds: number[] = article.comments.map((comment) => comment.id);
 
-if (commentIds.length > 0) {
-  await prisma.comment.deleteMany({ where: { id: { in: commentIds } } });
-}
+    // if (commentIds.length > 0) {
+    //   await prisma.comment.deleteMany({ where: { id: { in: commentIds } } });
+    // }
 
-await prisma.article.delete({
-  where: { id }
-});
+    await prisma.article.delete({
+      where: { id },
+    });
 
     return NextResponse.json(article, { status: 200 });
   } catch (error) {

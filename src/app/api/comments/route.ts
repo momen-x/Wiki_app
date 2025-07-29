@@ -8,14 +8,13 @@ import { CreateCommentDto } from "@/app/utils/SchemaDto";
 
 /**
  * @method POST
- * @route ~/api/posts/comments
+ * @route ~/api/comments
  * @description Create a new comment (only logged-in users)
  * @access private
  */
 export async function POST(request: NextRequest) {
   try {
     const user = verifyToken(request);
-    console.log("================================",user);
     
     if (!user) {
       return NextResponse.json(

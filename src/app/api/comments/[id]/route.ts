@@ -40,7 +40,7 @@ export async function PUT(request: NextRequest, { params }: Iprops) {
     const user = verifyToken(request);
     if (user === null || user.id !== Comment.userId) {
       return NextResponse.json(
-        { message: "u are not allowd to edit this post , access denied" },
+        { message: "u are not allowed to edit this comment , access denied" },
         { status: 403 }
       );
     }
@@ -84,22 +84,30 @@ export async function DELETE(request: NextRequest, { params }: Iprops) {
     }
 
     const user = verifyToken(request);
-    if (user === null || user.id !== Comment.userId) {
+       if (!user) {
       return NextResponse.json(
-        { message: "u are not allowd to edit this post , access denied" },
+        { message: "Invalid token. Access denied." },
+        { status: 401 }
+      );
+    }
+
+    if (user.id !== Comment.userId && !user.isAdmin) {
+      return NextResponse.json(
+        { message: "You are not allowed to delete this comment. Access denied." },
         { status: 403 }
       );
     }
-    if (user.id === Comment.userId || user.isAdmin) {
-      await prisma.comment.delete({ where: { id } });
-      NextResponse.json(
-        { message: "the comment has been deleted" },
-        { status: 200 }
-      );
-    }
-  } catch (error) {
+ await prisma.comment.delete({ where: { id } });
+    
     return NextResponse.json(
-      { message: "internal server error" },
+      { message: "The comment has been deleted successfully" },
+      { status: 200 }
+    );
+
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    return NextResponse.json(
+      { message: "Internal server error" },
       { status: 500 }
     );
   }
