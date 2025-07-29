@@ -31,9 +31,8 @@ const NavBar = async () => {
   const pages = [...basePages];
 
   const cookieStore = cookies();
-  const token = cookieStore.get("token"); // Read a cookie
-  const payload = verifyTokenForPage(token?.value);
-  // console.log(payload);
+  const token = (await cookieStore)?.get("token"); 
+  const payload = verifyTokenForPage(token?.value || "");
 
   if (payload?.isAdmin) {
     if (!pages.some((p) => p.name === "Admin Dashboard")) {

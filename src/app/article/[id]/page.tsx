@@ -28,11 +28,11 @@ interface IArticleType {
 
 const DynamicPage = async ({ params }: IParams) => {
   const cookieStore = cookies();
-  const token = cookieStore.get("token"); // Read a cookie
-  const payload = verifyTokenForPage(token?.value);
+  const token = (await cookieStore)?.get("token"); // Read a cookie
+  const payload = verifyTokenForPage(token?.value || "");
 
   let userId = false;
-  const id = params.id;
+  const id =  params?.id;
 
   if (isNaN(+id) || +id <= 0) {
     return <NotFound />;
@@ -113,10 +113,7 @@ const DynamicPage = async ({ params }: IParams) => {
             <AddCommentInputs id={id} />
           </div>
           <div className="w-2xl m-auto">
-            <ListOfComments
-              comments={article.comments}
-              userId={payload?.id}
-            />{" "}
+            <ListOfComments comments={article.comments} userId={payload?.id} />{" "}
           </div>
         </div>
       </div>

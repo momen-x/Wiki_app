@@ -23,8 +23,11 @@ export async function GET(request: NextRequest) {
       pageNumber = 1;
     }
     const articles = await prisma.article.findMany({
-      skip: Article_In_All_Page*(pageNumber-1),
+      skip: Article_In_All_Page * (pageNumber - 1),
       take: Article_In_All_Page,
+      orderBy: {
+        updatedAt: "desc",
+      },
       include: {
         user: {
           select: {

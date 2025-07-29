@@ -1,14 +1,10 @@
 "use client";
 import React, { useState } from "react";
 
-// const response = await fetch(
-//   `http://localhost:3000/api/articles?pageNumber=${pageNO}`
-// );
-
 const ArticlesErrorPage = ({
   errorType = "fetch", // "fetch", "network", "404", "500", "timeout"
   onRetry = () => {
-    window.location.href = "/articale";
+    window.location.href = "/article";
   },
   onGoHome = () => {
     window.location.href = "/";

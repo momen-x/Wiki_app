@@ -55,8 +55,8 @@ const navPages: INavPages[] = [
 ];
 
 const sidebarPages: ISidebarPages[] = [
-  { name: "Articles", path: "/admin/articles", icon: <ArticleOutlinedIcon /> },
-  { name: "Comments", path: "/admin/comments", icon: <MarkUnreadChatAltOutlinedIcon /> },
+  { name: "Articles", path: "/admindashboard/articles", icon: <ArticleOutlinedIcon /> },
+  { name: "Comments", path: "/admindashboard/comments", icon: <MarkUnreadChatAltOutlinedIcon /> },
 ];
 
 export default function AdminLayout(props: Props) {

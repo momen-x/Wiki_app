@@ -6,6 +6,9 @@ import { useState, useEffect, Suspense } from "react";
 import { Article_In_All_Page } from "../utils/CountOfArticleInPage";
 import axios from "axios";
 import { domin_name } from "../utils/DOMIN";
+import { getCountOfArticles } from "../utils/GetFunctions";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface IArticleData {
   userId: number;
@@ -14,8 +17,11 @@ interface IArticleData {
   description: string;
 }
 
-// Main component wrapped in Suspense to handle useSearchParams
-const ListOfArticlesContent = () => {
+interface ListOfArticlesContentProps {
+  userId: number;
+}
+
+const ListOfArticlesContent = ({ userId }: ListOfArticlesContentProps) => {
   const [searchInput, setSearchInput] = useState("");
   const [addArticlehInput, setAddArticlehInput] = useState({
     title: "",
@@ -26,75 +32,129 @@ const ListOfArticlesContent = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [isAddingArticle, setIsAddingArticle] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const pageNO = parseInt(searchParams.get("pageNumber") || "1", 10);
 
-  useEffect(() => {
-    const fetchCount = async () => {
-      try {
-        const response = await axios.get(`${domin_name}/api/articles/count`);
-        const count = response.data.message;
-        setTotalArticles(count);
-        setTotalPages(Math.ceil(count / Article_In_All_Page));
-      } catch (error) {
-        setError(true);
+  // Function to show error toast
+  const showError = (message: string) => {
+    toast.error(message, {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+  };
+
+  // Function to show success toast
+  const showSuccess = (message: string) => {
+    toast.success(message, {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+  };
+
+  // Function to fetch articles
+  const fetchArticles = async () => {
+    setLoading(true);
+    setError(false);
+
+    try {
+      const response = await axios.get(
+        `${domin_name}/api/articles?pageNumber=${pageNO}`
+      );
+      setArticles(response.data);
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        showError(
+          err.response?.data?.message || "Failed to load articles. Please try again."
+        );
+      } else {
+        showError("An unexpected error occurred while loading articles.");
       }
-    };
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Function to fetch article count
+  const fetchCount = async () => {
+    try {
+      const count = await getCountOfArticles();
+      setTotalArticles(count);
+      setTotalPages(Math.ceil(count / Article_In_All_Page));
+    } catch (error) {
+      showError("Failed to load article count. Please refresh the page.");
+      setError(true);
+    }
+  };
+
+  useEffect(() => {
     fetchCount();
   }, []);
 
   useEffect(() => {
-    const fetchArticles = async () => {
-      setLoading(true);
-      setError(false);
-
-      try {
-        const response = await axios.get(
-          `${domin_name}/api/articles?pageNumber=${pageNO}`
-        );
-        setArticles(response.data);
-      } catch (err) {
-        console.error("Error fetching articles:", err);
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchArticles();
   }, [pageNO]);
 
-  const handelAddArticle = () => {
+  const handelAddArticle = async () => {
     if (
       addArticlehInput.description.trim() === "" ||
       addArticlehInput.title.trim() === ""
     ) {
+      showError("Please fill in both title and description fields.");
       return;
     }
-    useEffect(() => {
-      const fetchAddArticles = async () => {
-        const body = {
-          title: addArticlehInput.title,
-          description: addArticlehInput.description,
-          userId: 5,
-        };
-        try {
-          setLoading(true);
-          const response = await axios.post(
-            `${domin_name}/api/api/articles`,
-        (body)
-          );
-          console.log(response.data);
-        } catch {
-          setError(true);
-        } finally {
-          setLoading(false);
+
+    const body = {
+      title: addArticlehInput.title,
+      description: addArticlehInput.description,
+      userId: userId,
+    };
+
+    try {
+      setIsAddingArticle(true);
+      setError(false);
+
+      const response = await axios.post(`${domin_name}/api/articles`, body, {
+        withCredentials: true,
+      });
+
+      showSuccess("Article added successfully!");
+      
+      setAddArticlehInput({
+        title: "",
+        description: "",
+      });
+
+      // Refresh data
+      await Promise.all([fetchArticles(), fetchCount()]);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          showError("Please login to add articles");
+        } else if (error.response?.status === 400) {
+          showError(error.response.data.message || "Invalid article data");
+        } else {
+          showError("Failed to add article. Please try again.");
         }
-      };
-    }, [addArticlehInput]);
+      } else {
+        showError("An unexpected error occurred.");
+      }
+    } finally {
+      setIsAddingArticle(false);
+    }
   };
+
   const formSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (searchInput.trim()) {
@@ -109,11 +169,9 @@ const ListOfArticlesContent = () => {
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages && newPage !== pageNO) {
-      // Update URL with new page parameter
       const currentParams = new URLSearchParams(searchParams.toString());
 
       if (newPage === 1) {
-        // Remove pageNumber parameter for page 1 (cleaner URLs)
         currentParams.delete("pageNumber");
       } else {
         currentParams.set("pageNumber", newPage.toString());
@@ -124,18 +182,15 @@ const ListOfArticlesContent = () => {
         : window.location.pathname;
 
       router.push(newUrl);
-
-      // Scroll to top when page changes
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   const getVisiblePages = () => {
-    const delta = 2; // Number of pages to show on each side of current page
+    const delta = 2;
     const range = [];
     const rangeWithDots: (number | string)[] = [];
 
-    // Handle edge case when totalPages is 1 or less
     if (totalPages <= 1) return [1];
 
     for (
@@ -146,32 +201,26 @@ const ListOfArticlesContent = () => {
       range.push(i);
     }
 
-    // Always include page 1
     rangeWithDots.push(1);
 
-    // Add dots if there's a gap between 1 and the range
     if (pageNO - delta > 2) {
       rangeWithDots.push("...");
     }
 
-    // Add the range (excluding page 1 if it's already there)
     range.forEach((page) => {
       if (page !== 1) {
         rangeWithDots.push(page);
       }
     });
 
-    // Add dots and last page if there's a gap
     if (pageNO + delta < totalPages - 1) {
       rangeWithDots.push("...");
     }
 
-    // Always include the last page (if it's not page 1)
     if (totalPages > 1 && !rangeWithDots.includes(totalPages)) {
       rangeWithDots.push(totalPages);
     }
 
-    // Remove duplicates while preserving order
     return rangeWithDots.filter(
       (page, index, arr) => arr.indexOf(page) === index
     );
@@ -199,6 +248,8 @@ const ListOfArticlesContent = () => {
 
   return (
     <>
+      <ToastContainer />
+      
       <form onSubmit={formSubmitHandler} className="max-w-4xl mx-auto mb-6">
         <input
           value={searchInput}
@@ -211,6 +262,7 @@ const ListOfArticlesContent = () => {
           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </form>
+
       <div className="max-w-4xl mx-auto mb-8 p-6 bg-white rounded-lg shadow-md">
         <h3 className="text-xl font-bold text-gray-800 mb-4">
           Add New Article
@@ -237,6 +289,7 @@ const ListOfArticlesContent = () => {
                 })
               }
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              disabled={isAddingArticle}
             />
           </div>
 
@@ -260,6 +313,7 @@ const ListOfArticlesContent = () => {
                 })
               }
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
+              disabled={isAddingArticle}
             />
           </div>
 
@@ -267,11 +321,19 @@ const ListOfArticlesContent = () => {
             onClick={handelAddArticle}
             disabled={
               !addArticlehInput.title.trim() ||
-              !addArticlehInput.description.trim()
+              !addArticlehInput.description.trim() ||
+              isAddingArticle
             }
             className="px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            Add Article
+            {isAddingArticle ? (
+              <>
+                <span className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
+                Adding...
+              </>
+            ) : (
+              "Add Article"
+            )}
           </button>
         </div>
       </div>
@@ -291,10 +353,8 @@ const ListOfArticlesContent = () => {
             </div>
           )}
 
-          {/* Pagination Controls */}
           {totalPages > 1 && (
             <div className="max-w-4xl mx-auto flex justify-center items-center space-x-2 mt-8">
-              {/* Previous Button */}
               <button
                 onClick={() => handlePageChange(pageNO - 1)}
                 disabled={pageNO === 1}
@@ -307,7 +367,6 @@ const ListOfArticlesContent = () => {
                 Prev
               </button>
 
-              {/* Page Numbers */}
               {getVisiblePages().map((page, index) => {
                 if (page === "...") {
                   return (
@@ -336,7 +395,6 @@ const ListOfArticlesContent = () => {
                 );
               })}
 
-              {/* Next Button */}
               <button
                 onClick={() => handlePageChange(pageNO + 1)}
                 disabled={pageNO === totalPages}
@@ -351,7 +409,6 @@ const ListOfArticlesContent = () => {
             </div>
           )}
 
-          {/* Page Info */}
           {totalPages > 1 && (
             <div className="max-w-4xl mx-auto text-center mt-4">
               <p className="text-sm text-gray-600">
@@ -365,18 +422,10 @@ const ListOfArticlesContent = () => {
   );
 };
 
-// Wrapper component with Suspense
-const ListOfArticles = () => {
+const ListOfArticles = ({ userId }: ListOfArticlesContentProps) => {
   return (
-    <Suspense
-      fallback={
-        <div className="max-w-4xl mx-auto text-center py-8">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-          <p className="mt-2 text-gray-600">Loading...</p>
-        </div>
-      }
-    >
-      <ListOfArticlesContent />
+    <Suspense fallback={<div>Loading...</div>}>
+      <ListOfArticlesContent userId={userId} />
     </Suspense>
   );
 };

@@ -8,7 +8,7 @@ import { CreateCommentDto } from "@/app/utils/SchemaDto";
 
 /**
  * @method POST
- * @route ~/api/posts/comments
+ * @route ~/api/comments
  * @description Create a new comment (only logged-in users)
  * @access private
  */

@@ -9,7 +9,7 @@ interface IId {
   id: number;
 }
 
-const AddCommentInputs = ({ id }: IId) => {  
+const AddCommentInputs = ({ id }: IId) => {
   const router = useRouter();
   const [addComment, setAddComment] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -17,23 +17,24 @@ const AddCommentInputs = ({ id }: IId) => {
     if (addComment.trim() === "") {
       return;
     }
+    // console.log("type id is : ",typeof +id);
 
     setIsLoading(true);
+
     try {
+      if (isNaN(+id)) {
+        throw new Error();
+      }
       const body = {
         text: addComment,
-        articleId: id,
+        articleId: +id,
       };
-console.log("==============================");
 
-      await axios.post(`${domin_name}/api/comments`,body);
-      console.log("111111111111111111111111111111111111111");
-      
+      await axios.post(`${domin_name}/api/comments`, body);
+
       setAddComment(""); // Clear input after successful submission
       router.refresh();
     } catch (error) {
-      console.log("222222222222222222222222222222222");
-      
       console.error("Error adding comment:", error);
     } finally {
       setIsLoading(false);
