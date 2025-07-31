@@ -27,8 +27,8 @@ const NavBar = async () => {
   const pages = [...basePages];
 
   const cookieStore = cookies();
-  const token = cookieStore.get("token"); // Read a cookie
-  const payload = verifyTokenForPage(token?.value);
+  const token = (await cookieStore)?.get("token");
+  const payload = verifyTokenForPage(token?.value ||"");
   // console.log(payload);
 
   if (payload?.isAdmin) {
