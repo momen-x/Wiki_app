@@ -11,26 +11,37 @@ interface AuthButtonsProps {
 
 export const AuthButtons = ({ payload, username }: AuthButtonsProps) => {
   return (
-    <div className="hidden md:flex items-center space-x-2 gap-2">
+    <div className="hidden md:flex items-center space-x-3">
       {payload ? (
-        <>
-          <strong className="text-amber-50">{username}</strong>
+        <div className="flex items-center space-x-3">
+          <div className="text-amber-50 font-medium">
+            {/* <span className="hidden lg:inline">Welcome, </span> */}
+            <Link href={"/profile"}>
+              <span className="truncate max-w-[120px] cursor-pointer">
+                {username}
+              </span>
+            </Link>
+          </div>
           <LogOutPage />
-        </>
+        </div>
       ) : (
-        <>
+        <div className="flex items-center space-x-2">
           <Button
             component={Link}
             href="/login"
             variant="outlined"
+            size="small"
             color="inherit"
             sx={{
+              margin: "5px",
               textTransform: "none",
               fontWeight: "600",
-              borderRadius: "4px",
-              padding: "6px 16px",
+              borderRadius: "6px",
+              padding: "4px 12px",
+              fontSize: "0.875rem",
               borderColor: "white",
               color: "white",
+              minWidth: "auto",
               "&:hover": {
                 backgroundColor: "rgba(255, 255, 255, 0.08)",
                 borderColor: "white",
@@ -42,24 +53,25 @@ export const AuthButtons = ({ payload, username }: AuthButtonsProps) => {
           <Button
             component={Link}
             href="/register"
-            variant="outlined"
-            color="inherit"
+            variant="contained"
+            size="small"
             sx={{
               textTransform: "none",
               fontWeight: "600",
-              borderRadius: "4px",
-              padding: "6px 16px",
-              borderColor: "white",
-              color: "white",
+              borderRadius: "6px",
+              padding: "4px 12px",
+              fontSize: "0.875rem",
+              backgroundColor: "white",
+              color: "#3b82f6",
+              minWidth: "auto",
               "&:hover": {
-                backgroundColor: "rgba(255, 255, 255, 0.08)",
-                borderColor: "white",
+                backgroundColor: "rgba(255, 255, 255, 0.9)",
               },
             }}
           >
             Register
           </Button>
-        </>
+        </div>
       )}
     </div>
   );

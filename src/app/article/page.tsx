@@ -1,6 +1,16 @@
+import { cookies } from "next/headers";
 import ListOfArticles from "../components/ListOfArticales";
+import { verifyTokenForPage } from "../utils/verifyToken";
 
-const ArticlePage = () => {
+const ArticlePage = async () => {
+  const cookieStore = cookies();
+  const token = (await cookieStore)?.get("token");
+  const payload = verifyTokenForPage(token?.value || "");
+
+
+  if (!payload) {
+    return <div>Unauthorized</div>;
+  }
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
@@ -10,5 +20,6 @@ const ArticlePage = () => {
     </div>
   );
 };
+
 
 export default ArticlePage;

@@ -27,12 +27,14 @@ import PersonIcon from "@mui/icons-material/Person";
 import InfoIcon from "@mui/icons-material/Info";
 
 import cloude from "../images/cloud.png";
+import LogOutPage from "../logout/page";
 
 const drawerWidth = 240;
 
 interface Props {
   window?: () => Window;
   children?: React.ReactNode;
+  username:string,
 }
 
 interface INavPages {
@@ -55,11 +57,24 @@ const navPages: INavPages[] = [
 ];
 
 const sidebarPages: ISidebarPages[] = [
+<<<<<<< Updated upstream
   { name: "Articles", path: "/admin/articles", icon: <ArticleOutlinedIcon /> },
   { name: "Comments", path: "/admin/comments", icon: <MarkUnreadChatAltOutlinedIcon /> },
+=======
+  {
+    name: "Articles",
+    path: "/admindashboard/articles",
+    icon: <ArticleOutlinedIcon />,
+  },
+  {
+    name: "Comments",
+    path: "/admindashboard/comments",
+    icon: <MarkUnreadChatAltOutlinedIcon />,
+  },
+>>>>>>> Stashed changes
 ];
 
-export default function AdminLayout(props: Props) {
+export default function AdminLayout(props: Props ) {
   const { window, children } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
@@ -82,7 +97,7 @@ export default function AdminLayout(props: Props) {
   const drawer = (
     <div>
       <Toolbar>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <DashboardIcon color="primary" />
           <Typography variant="h6" noWrap component="div">
             Dashboard
@@ -93,11 +108,16 @@ export default function AdminLayout(props: Props) {
       <List>
         {sidebarPages.map((page, index) => (
           <ListItem key={index} disablePadding>
-            <Link href={page.path} style={{ width: '100%', textDecoration: 'none', color: 'inherit' }}>
+            <Link
+              href={page.path}
+              style={{
+                width: "100%",
+                textDecoration: "none",
+                color: "inherit",
+              }}
+            >
               <ListItemButton>
-                <ListItemIcon>
-                  {page.icon}
-                </ListItemIcon>
+                <ListItemIcon>{page.icon}</ListItemIcon>
                 <ListItemText primary={page.name} />
               </ListItemButton>
             </Link>
@@ -107,17 +127,18 @@ export default function AdminLayout(props: Props) {
     </div>
   );
 
-  const container = window !== undefined ? () => window().document.body : undefined;
+  const container =
+    window !== undefined ? () => window().document.body : undefined;
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: "flex" }}>
       {/* Navigation Bar */}
       <AppBar
         position="fixed"
         sx={{
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: { sm: `${drawerWidth}px` },
-          bgcolor: 'rgb(59 130 246)', // blue-500
+          bgcolor: "rgb(59 130 246)", // blue-500
         }}
       >
         <Toolbar>
@@ -127,19 +148,26 @@ export default function AdminLayout(props: Props) {
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }}
+            sx={{ mr: 2, display: { sm: "none" } }}
           >
             <MenuIcon />
           </IconButton>
 
           {/* Logo - only show on mobile when sidebar is closed */}
-          <Box sx={{ display: { xs: 'flex', sm: 'none' }, alignItems: 'center', gap: 1, flexGrow: 1 }}>
+          <Box
+            sx={{
+              display: { xs: "flex", sm: "none" },
+              alignItems: "center",
+              gap: 1,
+              flexGrow: 1,
+            }}
+          >
             <Image
               src={cloude}
               alt="logo"
               width={32}
               height={32}
-              style={{ borderRadius: '50%' }}
+              style={{ borderRadius: "50%" }}
             />
             <Typography variant="h6" noWrap component="div">
               Cloude
@@ -149,18 +177,20 @@ export default function AdminLayout(props: Props) {
           </Box>
 
           {/* Desktop Navigation Links */}
-          <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 3, flexGrow: 1 }}>
+          <Box
+            sx={{ display: { xs: "none", md: "flex" }, gap: 3, flexGrow: 1 }}
+          >
             {navPages.map((page) => (
               <Link
                 key={page.name}
                 href={page.path}
-                style={{ textDecoration: 'none', color: 'inherit' }}
+                style={{ textDecoration: "none", color: "inherit" }}
               >
                 <Typography
                   variant="body1"
                   sx={{
-                    '&:hover': { color: 'rgb(252 211 77)' }, // amber-300
-                    transition: 'color 0.2s',
+                    "&:hover": { color: "rgb(252 211 77)" }, // amber-300
+                    transition: "color 0.2s",
                   }}
                 >
                   {page.name}
@@ -170,25 +200,22 @@ export default function AdminLayout(props: Props) {
           </Box>
 
           {/* Auth buttons */}
-          <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1 }}>
-            <Button
-              color="inherit"
-              variant="outlined"
-              sx={{
-                textTransform: "none",
-                fontWeight: "600",
-                borderRadius: "4px",
-                borderColor: "white",
-                color: "white",
-                "&:hover": {
-                  backgroundColor: "rgba(255, 255, 255, 0.08)",
-                  borderColor: "white",
-                },
-              }}
-            >
-              Login
-            </Button>
-            <Button
+          <Box
+            sx={{
+              display: {
+                xs: "none",
+                md: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              },
+              gap: 1,
+            }}
+          >
+            <Link href={"/profile"}>
+            <p className="cursor-pointer">{props.username}</p>
+            </Link>
+            <LogOutPage />
+            {/* <Button
               color="inherit"
               variant="outlined"
               sx={{
@@ -204,7 +231,7 @@ export default function AdminLayout(props: Props) {
               }}
             >
               Register
-            </Button>
+            </Button> */}
           </Box>
         </Toolbar>
       </AppBar>

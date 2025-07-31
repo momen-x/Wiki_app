@@ -28,11 +28,11 @@ interface IArticleType {
 
 const DynamicPage = async ({ params }: IParams) => {
   const cookieStore = cookies();
-  const token = cookieStore.get("token"); // Read a cookie
-  const payload = verifyTokenForPage(token?.value);
+  const token = (await cookieStore)?.get("token");
+  const payload = verifyTokenForPage(token?.value||"");
 
   let userId = false;
-  const id = params.id;
+  const id = params?.id;
 
   if (isNaN(+id) || +id <= 0) {
     return <NotFound />;
@@ -40,6 +40,7 @@ const DynamicPage = async ({ params }: IParams) => {
 
   try {
     const response = await fetch(`${domin_name}/api/articles/${id}`);
+    const userData=await fetch(`${domin_name}/api/`)
 
     if (!response.ok) {
       return <NotFound />;
