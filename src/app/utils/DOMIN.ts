@@ -1,1 +1,1 @@
-export const domin_name = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+export const domin_name = `https://wiki-jyhmmxkhe-momen-xs-projects.vercel.app`;
