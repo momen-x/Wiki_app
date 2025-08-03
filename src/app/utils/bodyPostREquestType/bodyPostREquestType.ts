@@ -1,4 +1,3 @@
-import { Password } from "@mui/icons-material";
 export interface IRegister {
   username: string;
   email: string;
@@ -20,7 +19,4 @@ export interface IEditUserData {
 export interface ICreateComment {
   text: string;
   articleId: number;
-}
-export interface IEditComment{
-  text:string;
 }

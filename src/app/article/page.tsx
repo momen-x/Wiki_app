@@ -17,8 +17,7 @@ const ArticlePage = async () => {
           Search for article
         </h1>
         <ListOfArticles
-        //  userId={payload?.id}
-          // username={payload?.username}
+        id={payload?.id}
           />
       </div>
     </div>

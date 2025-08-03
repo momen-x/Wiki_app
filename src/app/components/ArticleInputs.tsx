@@ -4,53 +4,86 @@ import axios from "axios";
 import { useState } from "react";
 import { domin_name } from "../utils/DOMIN";
 import { useRouter } from "next/navigation";
-const ArticleInputs = ({ id }: any) => {
-  const [articleInput, setArticaleInput] = useState({ title: "", body: "" });
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+const ArticleInputs = ({ id }: { id: string }) => {
+  const [articleInput, setArticleInput] = useState({ title: "", body: "" });
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
   const handleAddArticleByAdmin = async () => {
+    if (!articleInput.title || !articleInput.body) {
+      toast.error("Title and Body are required!");
+      return;
+    }
+
+    setIsLoading(true);
     try {
       const body = {
         userId: id,
-        description: articleInput.body,
         title: articleInput.title,
+        description: articleInput.body,
       };
-      axios.post(`${domin_name}/api/articles`, body);
-      // console.log("added");
-      setArticaleInput({ title: "", body: "" });
+
+      await axios.post(`${domin_name}/api/articles`, body);
+      
+      toast.success("Article added successfully! 🎉");
+      setArticleInput({ title: "", body: "" });
       router.refresh();
     } catch (error) {
-      // console.log(error);
+      toast.error("Failed to add article. Please try again.");
+      console.error("Error adding article:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
+
   return (
-    <Box className="flex flex-col gap-2 ">
-      <Typography variant="h4" component={"h3"}>
+    <Box className="flex flex-col gap-2">
+      <Typography variant="h4" component="h3">
         Add New Article
       </Typography>
       <TextField
         value={articleInput.title}
         id="title"
-        label="title"
+        label="Title"
         variant="outlined"
-        maxRows={8}
-        onChange={(e) => {
-          setArticaleInput({ ...articleInput, title: e.target.value });
-        }}
+        onChange={(e) =>
+          setArticleInput({ ...articleInput, title: e.target.value })
+        }
       />
       <TextField
         value={articleInput.body}
-        onChange={(e) => {
-          setArticaleInput({ ...articleInput, body: e.target.value });
-        }}
         id="body"
-        label="body"
+        label="Body"
         multiline
         rows={4}
         variant="outlined"
+        onChange={(e) =>
+          setArticleInput({ ...articleInput, body: e.target.value })
+        }
       />
-      <Button variant="contained" onClick={handleAddArticleByAdmin}>
-        Add
+      <Button
+        variant="contained"
+        onClick={handleAddArticleByAdmin}
+        disabled={isLoading}
+      >
+        {isLoading ? "Adding..." : "Add"}
       </Button>
+      
+      {/* Toast Container (renders the toasts) */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </Box>
   );
 };

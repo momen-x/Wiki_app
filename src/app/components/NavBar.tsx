@@ -19,7 +19,7 @@ interface IURL {
 
 const basePages: IURL[] = [
   { name: "Home", path: "/", icon: <HomeIcon /> },
-  { name: "Article", path: "/article?pageNumber=1", icon: <ArticleIcon /> },
+  { name: "Article", path: "/article", icon: <ArticleIcon /> },
   { name: "About", path: "/about", icon: <InfoIcon /> },
 ];
 

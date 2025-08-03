@@ -1,7 +1,7 @@
 import { ILogin } from "@/app/utils/bodyPostREquestType/bodyPostREquestType";
 import { LoginDto } from "@/app/utils/SchemaDto";
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/app/utils/db";
+import { prisma } from "@/lib/prisma";     // ✅ or wherever your prisma.ts lives
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { serialize } from "cookie";

@@ -19,7 +19,7 @@ const ShowSingleArticle = ({ id, article, userId }: any) => {
         router.push("/article?pageNumber=1");
       } catch (error) {
         // console.log("error : ", error);
-      return;
+        return;
       }
     }
   };
@@ -28,7 +28,7 @@ const ShowSingleArticle = ({ id, article, userId }: any) => {
   useEffect(() => {
     const fetch = async () => {
       try {
-        console.log("userdata : ", article.userId);
+        // console.log("userdata : ", article.userId);
 
         const response = await axios.get(
           `${domin_name}/api/users/${article.userId}`
@@ -37,7 +37,8 @@ const ShowSingleArticle = ({ id, article, userId }: any) => {
         //  console.log('>>>>>>>>>>>>>>>>> : ',data);
         setUsername(userData);
       } catch (error) {
-        console.log(error);
+        // console.log(error);
+        return;
       }
     };
     fetch();

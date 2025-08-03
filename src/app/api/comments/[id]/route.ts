@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Comment } from "../../../../generated/prisma/index";
-import { prisma } from "@/app/utils/db";
-import { IEditComment } from "@/app/utils/bodyPostREquestType/bodyPostREquestType";
-import { EditCommentDto } from "@/app/utils/SchemaDto";
 import { verifyToken } from "@/app/utils/verifyToken";
+import { prisma } from "@/lib/prisma";     // ✅ or wherever your prisma.ts lives
+import { z } from 'zod';
 interface Iprops {
   params: Promise<{ id: string }>;
 }
+ interface IEditComment {
+  text: string;
+}
+
+export const EditCommentDto = z.object({
+  text: z.string().min(1),
+});
 /**
  * @method PUT
  * @route ~/api/comments/:id
@@ -84,7 +89,7 @@ export async function DELETE(request: NextRequest, { params }: Iprops) {
     }
 
     const user = verifyToken(request);
-       if (!user) {
+    if (!user) {
       return NextResponse.json(
         { message: "Invalid token. Access denied." },
         { status: 401 }
@@ -93,17 +98,18 @@ export async function DELETE(request: NextRequest, { params }: Iprops) {
 
     if (user.id !== Comment.userId && !user.isAdmin) {
       return NextResponse.json(
-        { message: "You are not allowed to delete this comment. Access denied." },
+        {
+          message: "You are not allowed to delete this comment. Access denied.",
+        },
         { status: 403 }
       );
     }
- await prisma.comment.delete({ where: { id } });
-    
+    await prisma.comment.delete({ where: { id } });
+
     return NextResponse.json(
       { message: "The comment has been deleted successfully" },
       { status: 200 }
     );
-
   } catch (error) {
     console.error("Error deleting comment:", error);
     return NextResponse.json(

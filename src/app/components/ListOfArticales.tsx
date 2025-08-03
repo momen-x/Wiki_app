@@ -18,7 +18,7 @@ interface IArticleData {
 }
 
 // Main component wrapped in Suspense to handle useSearchParams
-const ListOfArticlesContent = () => {
+const ListOfArticlesContent = ({ id }: any) => {
   const [searchInput, setSearchInput] = useState("");
   const [addArticlehInput, setAddArticlehInput] = useState({
     title: "",
@@ -33,7 +33,7 @@ const ListOfArticlesContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Use 'page' instead of 'pageNumber' to match your working admin page
+  // Use 'page' parameter to match your API
   const pageNO = parseInt(searchParams.get("page") || "1", 10);
 
   // Function to show error toast
@@ -65,18 +65,26 @@ const ListOfArticlesContent = () => {
     setLoading(true);
     setError(false);
 
-      try {
-        const response = await axios.get(
-          `${domin_name}/api/articles?pageNumber=${pageNO}`
-        );
+    try {
+      // Fixed: Use 'page' parameter to match your API
+      const response = await axios.get(
+        `${domin_name}/api/articles?page=${pageNO}&limit=${Article_In_All_Page}`
+      );
+
+      // Handle the response properly - check the structure
+      if (response.data.articles) {
+        setArticles(response.data.articles);
+      } else {
         setArticles(response.data);
-      } catch (err) {
-        console.error("Error fetching articles:", err);
-        setError(true);
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (err) {
+      console.error("Error fetching articles:", err);
+      showError("Failed to load articles. Please try again.");
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Function to fetch article count
   const fetchCount = async () => {
@@ -98,6 +106,7 @@ const ListOfArticlesContent = () => {
     fetchArticles();
   }, [pageNO]);
 
+  // Fixed handelAddArticle function
   const handelAddArticle = async () => {
     if (
       addArticlehInput.description.trim() === "" ||
@@ -106,28 +115,40 @@ const ListOfArticlesContent = () => {
       showError("Please fill in both title and description fields.");
       return;
     }
-    useEffect(() => {
-      const fetchAddArticles = async () => {
-        const body = {
-          title: addArticlehInput.title,
-          description: addArticlehInput.description,
-          userId: 5,
-        };
-        try {
-          setLoading(true);
-          const response = await axios.post(
-            `${domin_name}/api/api/articles`,
-        (body)
-          );
-          console.log(response.data);
-        } catch {
-          setError(true);
-        } finally {
-          setLoading(false);
-        }
-      };
-    }, [addArticlehInput]);
+
+    const body = {
+      title: addArticlehInput.title,
+      description: addArticlehInput.description,
+      userId: id,
+    };
+
+    try {
+      setIsAddingArticle(true);
+
+      // Fixed: Removed duplicate 'api' in URL
+      const response = await axios.post(`${domin_name}/api/articles`, body);
+
+      console.log("Article added successfully:", response.data);
+      showSuccess("Article added successfully!");
+
+      // Clear the form
+      setAddArticlehInput({ title: "", description: "" });
+
+      // Refresh the articles list and count
+      await fetchCount();
+      await fetchArticles();
+    } catch (error: any) {
+      console.error("Error adding article:", error);
+      showError(
+        error.response?.data?.message ||
+          "Failed to add article. Please try again."
+      );
+      setError(true);
+    } finally {
+      setIsAddingArticle(false);
+    }
   };
+
   const formSubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (searchInput.trim()) {
@@ -140,73 +161,99 @@ const ListOfArticlesContent = () => {
     return text.substring(0, maxLength) + "...";
   };
 
-  const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= totalPages && newPage !== pageNO) {
-      // Update URL with new page parameter
-      const currentParams = new URLSearchParams(searchParams.toString());
+  // Pagination component similar to your working admin page
+  const PaginationControls = () => {
+    const generatePageNumbers = () => {
+      const pages: (number | string)[] = [];
+      const maxVisiblePages = 5;
+      let startPage = 1;
+      let endPage = totalPages;
 
-      if (newPage === 1) {
-        // Remove pageNumber parameter for page 1 (cleaner URLs)
-        currentParams.delete("pageNumber");
-      } else {
-        currentParams.set("pageNumber", newPage.toString());
+      if (totalPages > maxVisiblePages) {
+        const half = Math.floor(maxVisiblePages / 2);
+        startPage = Math.max(1, pageNO - half);
+        endPage = Math.min(totalPages, pageNO + half);
+
+        if (pageNO - half < 1) {
+          endPage = maxVisiblePages;
+        } else if (pageNO + half > totalPages) {
+          startPage = totalPages - maxVisiblePages + 1;
+        }
       }
 
-      const newUrl = currentParams.toString()
-        ? `${window.location.pathname}?${currentParams.toString()}`
-        : window.location.pathname;
-
-      router.push(newUrl);
-
-      // Scroll to top when page changes
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
-
-  const getVisiblePages = () => {
-    const delta = 2; // Number of pages to show on each side of current page
-    const range = [];
-    const rangeWithDots: (number | string)[] = [];
-
-    // Handle edge case when totalPages is 1 or less
-    if (totalPages <= 1) return [1];
-
-    for (
-      let i = Math.max(2, pageNO - delta);
-      i <= Math.min(totalPages - 1, pageNO + delta);
-      i++
-    ) {
-      range.push(i);
-    }
-
-    // Always include page 1
-    rangeWithDots.push(1);
-
-    // Add dots if there's a gap between 1 and the range
-    if (pageNO - delta > 2) {
-      rangeWithDots.push("...");
-    }
-
-    // Add the range (excluding page 1 if it's already there)
-    range.forEach((page) => {
-      if (page !== 1) {
-        rangeWithDots.push(page);
+      // Always show first page
+      if (startPage > 1) {
+        pages.push(1);
+        if (startPage > 2) {
+          pages.push("...");
+        }
       }
-    });
 
-    // Add dots and last page if there's a gap
-    if (pageNO + delta < totalPages - 1) {
-      rangeWithDots.push("...");
-    }
+      // Middle pages
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
 
-    // Always include the last page (if it's not page 1)
-    if (totalPages > 1 && !rangeWithDots.includes(totalPages)) {
-      rangeWithDots.push(totalPages);
-    }
+      // Always show last page
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          pages.push("...");
+        }
+        pages.push(totalPages);
+      }
 
-    // Remove duplicates while preserving order
-    return rangeWithDots.filter(
-      (page, index, arr) => arr.indexOf(page) === index
+      return pages;
+    };
+
+    const pageNumbers = generatePageNumbers();
+
+    return (
+      <div className="flex items-center justify-center gap-2 mt-6">
+        {/* Previous Button */}
+        <Link
+          href={`?page=${Math.max(1, pageNO - 1)}`}
+          className={`px-4 py-2 rounded-md border text-sm font-medium transition-colors ${
+            pageNO <= 1
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200 pointer-events-none"
+              : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+          }`}
+        >
+          Prev
+        </Link>
+
+        {/* Page Numbers */}
+        {pageNumbers.map((pageNum, index) =>
+          pageNum === "..." ? (
+            <span key={`ellipsis-${index}`} className="px-2 text-gray-500">
+              ...
+            </span>
+          ) : (
+            <Link
+              key={pageNum}
+              href={`?page=${pageNum}`}
+              className={`px-4 py-2 rounded-md border text-sm font-medium transition-colors ${
+                pageNum === pageNO
+                  ? "bg-blue-500 text-white border-blue-500"
+                  : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+              }`}
+            >
+              {pageNum}
+            </Link>
+          )
+        )}
+
+        {/* Next Button */}
+        <Link
+          href={`?page=${Math.min(totalPages, pageNO + 1)}`}
+          className={`px-4 py-2 rounded-md border text-sm font-medium transition-colors ${
+            pageNO >= totalPages
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200 pointer-events-none"
+              : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+          }`}
+        >
+          Next
+        </Link>
+      </div>
     );
   };
 
@@ -233,17 +280,24 @@ const ListOfArticlesContent = () => {
   return (
     <>
       <form onSubmit={formSubmitHandler} className="max-w-4xl mx-auto mb-6">
-        <input
-          value={searchInput}
-          type="search"
-          name="search"
-          id="search"
-          placeholder="Search articles"
-          title="Search articles"
-          onChange={(e) => setSearchInput(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        />
-        <button type="submit" className="bg-sky-300 ml-2 p-3 text-amber-50 rounded-2xl cursor-pointer">search</button>
+        <div className="flex gap-2">
+          <input
+            value={searchInput}
+            type="search"
+            name="search"
+            id="search"
+            placeholder="Search articles"
+            title="Search articles"
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <button
+            type="submit"
+            className="px-6 py-2 bg-sky-500 text-white rounded-md hover:bg-sky-600 transition-colors cursor-pointer"
+          >
+            Search
+          </button>
+        </div>
       </form>
 
       <div className="max-w-4xl mx-auto mb-8 p-6 bg-white rounded-lg shadow-md">
@@ -336,66 +390,10 @@ const ListOfArticlesContent = () => {
             </div>
           )}
 
-          {/* Pagination Controls */}
-          {totalPages > 1 && (
-            <div className="max-w-4xl mx-auto flex justify-center items-center space-x-2 mt-8">
-              {/* Previous Button */}
-              <button
-                onClick={() => handlePageChange(pageNO - 1)}
-                disabled={pageNO === 1}
-                className={`px-3 py-2 border rounded-md transition-colors ${
-                  pageNO === 1
-                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                    : "hover:bg-gray-100 text-gray-700"
-                }`}
-              >
-                Prev
-              </button>
+          {/* Pagination Controls using Link components */}
+          {totalPages > 1 && <PaginationControls />}
 
-              {/* Page Numbers */}
-              {getVisiblePages().map((page, index) => {
-                if (page === "...") {
-                  return (
-                    <span
-                      key={`dots-${index}`}
-                      className="px-2 py-2 text-gray-500"
-                    >
-                      ...
-                    </span>
-                  );
-                }
-
-                const pageNum = page as number;
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => handlePageChange(pageNum)}
-                    className={`px-3 py-2 border rounded-md transition-all duration-200 ${
-                      pageNum === pageNO
-                        ? "bg-blue-500 text-white border-blue-500 shadow-md"
-                        : "hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 text-gray-700 hover:shadow-sm"
-                    }`}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              })}
-
-              {/* Next Button */}
-              <button
-                onClick={() => handlePageChange(pageNO + 1)}
-                disabled={pageNO === totalPages}
-                className={`px-3 py-2 border rounded-md transition-colors ${
-                  pageNO === totalPages
-                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                    : "hover:bg-gray-100 text-gray-700"
-                }`}
-              >
-                Next
-              </button>
-            </div>
-          )}
-
+          {/* Page Info */}
           {totalPages > 1 && (
             <div className="max-w-4xl mx-auto text-center mt-4">
               <p className="text-sm text-gray-600">
@@ -405,12 +403,15 @@ const ListOfArticlesContent = () => {
           )}
         </div>
       )}
+
+      {/* Toast Container */}
+      <ToastContainer />
     </>
   );
 };
 
 // Wrapper component with Suspense
-const ListOfArticles = () => {
+const ListOfArticles = ({ id }: any) => {
   return (
     <Suspense
       fallback={
@@ -420,7 +421,7 @@ const ListOfArticles = () => {
         </div>
       }
     >
-      <ListOfArticlesContent />
+      <ListOfArticlesContent id={id} />
     </Suspense>
   );
 };

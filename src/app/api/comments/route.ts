@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/app/utils/db";
+import { prisma } from "@/lib/prisma";     // ✅ or wherever your prisma.ts lives
 import { verifyToken } from "@/app/utils/verifyToken"; // Adjust path as needed
 import { ICreateComment } from "@/app/utils/bodyPostREquestType/bodyPostREquestType";
 import { CreateCommentDto } from "@/app/utils/SchemaDto";

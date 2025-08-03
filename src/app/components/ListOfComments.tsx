@@ -7,7 +7,6 @@ import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import axios from "axios";
 import { domin_name } from "../utils/DOMIN";
-
 import { useRouter } from "next/navigation";
 import { useState, useContext } from "react";
 import DialogToEditComment from "./DialogToEditComment";

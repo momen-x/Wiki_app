@@ -56,9 +56,7 @@ export const CreateCommentDto = z.object({
   articleId: z.number(),
 });
 
-export const EditCommentDto = z.object({
-  text: z.string().min(1),
-});
+
 
 export const DeleteAcountDto = z.object({
   password: z.string().min(8).max(50),

@@ -1,7 +1,5 @@
-import { prisma } from "@/app/utils/db";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
-
+import { prisma } from "@/lib/prisma";     // ✅ or wherever your prisma.ts lives
 interface Iprops {
   params: Promise<{ id: string }>;
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "../../../utils/db";
+import { prisma } from "@/lib/prisma";     // ✅ or wherever your prisma.ts lives
 import { Article_In_All_Page } from "@/app/utils/CountOfArticleInPage";
 
 /**

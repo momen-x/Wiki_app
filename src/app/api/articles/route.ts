@@ -1,6 +1,6 @@
 // app/api/article/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/app/utils/db";
+import { prisma } from "@/lib/prisma";     // ✅ or wherever your prisma.ts lives
 import { createArticleSchema } from "@/app/utils/SchemaDto";
 import { verifyToken } from "@/app/utils/verifyToken";
 import { Article_In_All_Page } from "../../utils/CountOfArticleInPage";

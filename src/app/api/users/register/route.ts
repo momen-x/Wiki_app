@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "../../../utils/db";
+import { prisma } from "@/lib/prisma";     // ✅ or wherever your prisma.ts lives
 import { IRegister } from "@/app/utils/bodyPostREquestType/bodyPostREquestType";
 import { RegisterAcount } from "@/app/utils/SchemaDto";
 import bcrypt from "bcryptjs";
