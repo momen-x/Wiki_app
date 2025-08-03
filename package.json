@@ -5,9 +5,12 @@
   "engines": {
     "node": ">=18.0.0"
   },
- "scripts": {
-    "build": "prisma generate && prisma db push && next build"
+
+  "scripts": {
+    "postinstall": "prisma generate",
+    "build": "prisma migrate deploy && next build"
   },
+
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
