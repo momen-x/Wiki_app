@@ -1,2 +1,2 @@
 
-export const domin_name = "http://localhost:3000";
+export const domin_name = "https://wiki-iqsvk9uh4-momen-xs-projects.vercel.app";
