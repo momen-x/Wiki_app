@@ -1,3 +1,4 @@
+"use client"
 import axios from "axios";
 import { useState } from "react";
 import { domin_name } from "../utils/DOMIN";
