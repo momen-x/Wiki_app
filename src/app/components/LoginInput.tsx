@@ -35,6 +35,8 @@ const LoginInput = () => {
     setError("");
 
     try {
+      console.log("domine ??????? ",domin_name);
+      
       const response = await axios.post(
         `${domin_name}/api/users/login`,
         loginInputs

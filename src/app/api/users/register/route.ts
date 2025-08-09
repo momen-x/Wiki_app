@@ -60,15 +60,15 @@ export async function POST(request: NextRequest) {
       isAdmin: newUser.isAdmin,
       username: newUser.username,
     };
-    if (!process.env.PRIVATE_KEY) {
-      console.error("PRIVATE_KEY is not defined in environment variables.");
+    if (!process.env.JWT_SECRET) {
+      console.error("JWT_SECRET is not defined in environment variables.");
       return NextResponse.json(
         { error: "Internal server error" },
         { status: 500 }
       );
     }
 
-    const token = jwt.sign(jwtPayload, process.env.PRIVATE_KEY);
+    const token = jwt.sign(jwtPayload, process.env.JWT_SECRET);
     const cookie = serialize("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",

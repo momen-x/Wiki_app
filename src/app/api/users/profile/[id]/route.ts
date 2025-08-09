@@ -45,7 +45,7 @@ export async function DELETE(request: NextRequest, { params }: Iprops) {
 
     const userFromToken = jwt.verify(
       jwtToken.value,
-      process.env.PRIVATE_KEY as string
+      process.env.JWT_SECRET as string
     ) as JwtPayload;
 
     if (userFromToken.id !== id && userFromToken.isAdmin===false) {
@@ -180,7 +180,7 @@ export async function PUT(request: NextRequest, { params }: Iprops) {
     const token = jwtToken?.value as string;
     const userFromToken = jwt.verify(
       token,
-      process.env.PRIVATE_KEY as string
+      process.env.JWT_SECRET as string
     ) as JwtPayload;
 
     if (userFromToken.id !== id) {
@@ -263,7 +263,7 @@ export async function PUT(request: NextRequest, { params }: Iprops) {
         email: updatedUser.email,
         isAdmin: updatedUser.isAdmin,
       },
-      process.env.PRIVATE_KEY as string,
+      process.env.JWT_SECRET as string,
       { expiresIn: "30d" }
     );
 

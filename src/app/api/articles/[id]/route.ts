@@ -136,7 +136,7 @@ export async function DELETE(request: NextRequest, { params }: Iprops) {
     const token = jwtToken.value;
     const userFromToken = jwt.verify(
       token,
-      process.env.PRIVATE_KEY as string
+      process.env.JWT_SECRET as string
     ) as JwtPayload;
 
     // Check if user is either the author or an admin

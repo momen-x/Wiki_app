@@ -12,7 +12,7 @@ export function verifyToken(request: NextRequest): JwtPayload | null {
       return null;
     }
 
-    const privateKey = process.env.PRIVATE_KEY as string;
+    const privateKey = process.env.JWT_SECRET as string;
     const userPayload = jwt.verify(token, privateKey) as JwtPayload;
 
     return userPayload;
@@ -24,7 +24,7 @@ export function verifyToken(request: NextRequest): JwtPayload | null {
 export function verifyTokenForPage(token: string): JwtPayload | null {
   try {
     if (!token) return null;
-    const privateKey = process.env.PRIVATE_KEY;
+    const privateKey = process.env.JWT_SECRET;
     if (!privateKey) {
       return null;
     }
