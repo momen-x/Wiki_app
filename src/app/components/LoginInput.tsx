@@ -11,6 +11,9 @@ interface IInput {
 }
 
 const LoginInput = () => {
+  console.log("domine_name is : ", domin_name);
+
+  
   const [loginInputs, setLoginInputs] = useState<IInput>({
     email: "",
     password: "",
