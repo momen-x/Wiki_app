@@ -1,5 +1,6 @@
-export const domin_name =process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
-// "https://wiki-app-mu.vercel.app"
+export const domin_name =process.env.NEXT_PUBLIC_API_URL || "https://wiki-app-mu.vercel.app"
+//  "http://localhost:3000"
+//
 /** 
  * 
  process.env.NODE_ENV  ==="production"
