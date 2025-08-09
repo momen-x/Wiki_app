@@ -2,6 +2,7 @@
 import { domin_name } from "@/app/utils/DOMIN";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 // import { Toaster } from "@/components/ui/sonner";
 
 interface IParams {
@@ -38,7 +39,7 @@ const UserProfile = ({ id }: IParams) => {
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState<IUserProfile | null>(null);
-
+const router=useRouter();
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -86,7 +87,7 @@ const UserProfile = ({ id }: IParams) => {
           </h1>
           <p className="text-gray-600">{error.message}</p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={() =>router.refresh() }
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
           >
             Try Again

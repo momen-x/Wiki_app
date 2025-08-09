@@ -12,6 +12,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { editComment } from "../utils/editComment";
+import { useRouter } from "next/navigation";
 
 interface IProps {
   props: {
@@ -25,7 +26,7 @@ const EditCommentDialog = ({ props }: IProps) => {
   const [inputComment, setInputComment] = useState("");
   const [errors, setErrors] = useState("");
   const [loading, setLoading] = useState(false);
-  // const router = useRouter();
+  const router = useRouter();
 
   const handleClose = () => {
     props.setOpen(false);
@@ -53,10 +54,10 @@ const EditCommentDialog = ({ props }: IProps) => {
     try {
       let b = await editComment(+props.id, inputComment);
       toast.success("Article updated successfully");
-      // router.refresh();
+      router.refresh();
       
 
-      window.location.reload();
+      // window.location.reload();
       handleClose();
     } catch (error: any) {
       toast.error(

@@ -11,6 +11,7 @@ import {
   DialogTitle,
   TextField,
 } from "@mui/material";
+import { useRouter } from "next/navigation";
 
 interface IDeleteAcountDialogProps {
   id: string;
@@ -22,6 +23,8 @@ const DeleteAcountDialog = ({
   open,
   setOpen,
 }: IDeleteAcountDialogProps) => {
+  const router = useRouter();
+
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState("");
 
@@ -60,7 +63,10 @@ const handlDeleteAcount = async () => {
     toast.success("Account deleted successfully");
     handleClose();
     // Redirect to home or login page after deletion
-    window.location.href = '/';
+    // window.location.href = '/';
+    router.push("/");
+
+    
   } catch (error: any) {
     if (error.response) {
       const message = error.response.data.message || "Failed to delete account";

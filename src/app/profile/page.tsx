@@ -6,7 +6,7 @@ import { Toaster } from "sonner";
 
 import TuneTwoToneIcon from "@mui/icons-material/TuneTwoTone";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import AdminDeleteAndEditButton from "../components/AdminDeleteAndEditButton";
 
 interface ICommentOnArticlesUser {
@@ -36,6 +36,7 @@ interface IUserProfile {
 }
 
 const ProfilePage = async () => {
+  const router=useRouter();
   const cookieStore = cookies();
   const token = (await cookieStore)?.get("token");
   const payload = verifyTokenForPage(token?.value || "");
@@ -165,7 +166,7 @@ const ProfilePage = async () => {
               : "An unknown error occurred"}
           </p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={() =>router.refresh() }
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
           >
             Try Again

@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "public"."Article" ALTER COLUMN "title" SET DATA TYPE VARCHAR(300),
+ALTER COLUMN "description" SET DATA TYPE TEXT;

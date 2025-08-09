@@ -4,14 +4,17 @@ import React, { useState } from "react";
 
 
 const ArticlesErrorPage = ({
+
   errorType = "fetch", // "fetch", "network", "404", "500", "timeout"
   onRetry = () => {
-    window.location.href = "/article";
+    // window.location.href = "/article";
   },
+
   onGoHome = () => {
-    window.location.href = "/";
+    // window.location.href = "/";
   },
 }) => {
+
   const [isRetrying, setIsRetrying] = useState(false);
 
   const handleRetry = async () => {

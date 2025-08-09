@@ -4,7 +4,7 @@ export const IEditArticle = z.object({
   title: z
     .string()
     .min(2, { message: "title should be 2 characters long" }).optional(),
-  description: z.string().min(2).optional(),
+  description: z.string().min(2)
 });
 export const createArticleSchema = z.object({
   title: z

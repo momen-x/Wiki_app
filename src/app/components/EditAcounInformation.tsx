@@ -73,7 +73,8 @@ const EditAccountInformation = ({ id }: { id: string }) => {
         }
         toast.success("Profile updated successfully. Reloading...");
         setTimeout(() => {
-          window.location.reload();
+          // window.location.reload();
+          router.refresh();
         }, 1000);
       } else {
         toast.success("Profile updated successfully");

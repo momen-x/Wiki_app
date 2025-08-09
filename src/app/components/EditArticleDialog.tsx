@@ -12,6 +12,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { EditArticle } from "../utils/editArticle";
+import { useRouter } from "next/navigation";
 
 interface IProps {
   props: {
@@ -24,6 +25,7 @@ interface IProps {
 }
 
 const EditArticleDialog = ({ props }: IProps) => {
+  const router=useRouter();
   const [inputArticle, setInputArticle] = useState({
     title: props.title,
     description: props.description,
@@ -69,8 +71,8 @@ const EditArticleDialog = ({ props }: IProps) => {
         +props.id
       );
       toast.success("Article updated successfully");
-      // router.refresh();
-      window.location.reload();
+      router.refresh();
+      // window.location.reload();
       handleClose();
     } catch (error: any) {
       toast.error(

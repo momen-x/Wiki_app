@@ -25,8 +25,8 @@ model User {
 
 model Article {
   id          Int       @id @default(autoincrement())
-  title       String    @db.VarChar(100)
-  description String    @db.VarChar(300)
+  title       String    @db.VarChar(300)
+  description String    @db.Text
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   userId      Int

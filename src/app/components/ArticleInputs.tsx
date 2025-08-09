@@ -25,6 +25,7 @@ const ArticleInputs = ({ id }: { id: string }) => {
         title: articleInput.title,
         description: articleInput.body,
       };
+      
 
       await axios.post(`${domin_name}/api/articles`, body);
       

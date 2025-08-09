@@ -7,12 +7,14 @@ export const EditArticle = async (
   id: number
 ) => {
   try {
-    await axios.put(`${domin_name}/api/articles/${id}`, {
+    const response = await axios.put(`${domin_name}/api/articles/${id}`, {
       title: title,
       description: description,
     });
-    console.log("ubdated");
+    console.log("updated");
+    return response.data;
   } catch (error) {
-    console.log("error");
+    console.error("Error updating article:", error);
+    throw error; // Re-throw the error so it can be caught by the component
   }
 };

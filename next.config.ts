@@ -12,6 +12,14 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+   api: {
+    bodyParser: {
+      sizeLimit: '10mb', // Increase to your needs
+    },
+  }, // For App Router (which you're using)
+  experimental: {
+    serverComponentsExternalPackages: [],
+  },
   compress: true,
   poweredByHeader: false,
 };
