@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📚 Wiki App
 
-## Getting Started
+A modern, full-featured wiki application where users can create, read, edit, and discuss articles in a collaborative environment.
 
-First, run the development server:
+## ✨ Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### 🔐 Authentication & User Management
+- **User Registration & Login** - Secure authentication system
+- **User Profiles** - Personalized profile pages
+- **Profile Updates** - Users can update their personal information
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 📝 Article System
+- **Create Articles** - Write and publish new wiki articles
+- **Read Articles** - Browse and read all published articles
+- **Edit Articles** - Authors can modify their own articles
+- **Article Search** - Find articles by keywords or content
+- **Responsive Design** - Accessible on all devices
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 💬 Commenting System
+- **Add Comments** - Users can comment on articles
+- **Edit Comments** - Users can modify their own comments
+- **Delete Comments** - Remove unwanted comments
+- **Threaded Discussions** - Engage in article discussions
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 🛡️ Admin Features
+- **Admin Dashboard** - Special panel for administrators
+- **Content Moderation** - Manage all articles and comments
+- **User Management** - Oversee user accounts and permissions
 
-## Learn More
+### 🎨 UI/UX Features
+- **Modern Design** - Clean, intuitive interface with shadsn/ui library
+- **Dark/Light Mode** - Theme toggle for comfortable reading
+- **Real-time Updates** - Instant content refresh
+- **Form Validation** - Robust input validation with helpful errors
+- **Toast Notifications** - User-friendly feedback messages
 
-To learn more about Next.js, take a look at the following resources:
+## 🚀 Getting Started
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Prerequisites
+- Node.js 18.x or higher
+- npm or yarn package manager
+- Database PostgreSQL
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Installation
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/momen-x/Wiki_app.git
+   cd Wiki-app
