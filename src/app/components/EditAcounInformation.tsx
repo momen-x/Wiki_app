@@ -7,10 +7,10 @@ import EmailIcon from "@mui/icons-material/Email";
 import SaveIcon from "@mui/icons-material/Save";
 import LockIcon from "@mui/icons-material/Lock";
 import axios from "axios";
-import { domin_name } from "../utils/DOMIN";
+import { domain_name } from "../utils/Domain";
 import { useRouter } from "next/navigation";
 import DialogEditPasswordAccount from "./DialogEditPasswordAccount";
-import DeleteAcountDialog from "./DeleteAcountDialog";
+import DeleteAccounttDialog from "./DeleteAcountDialog";
 
 interface UserData {
   username: string;
@@ -29,7 +29,7 @@ const EditAccountInformation = ({ id }: { id: string }) => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [openPasswordDialog, setOpenPasswordDialog] = useState(false);
-  const [openDeleteAcountDialog, setOpenDeleteAcountDialog] = useState(false);
+  const [openDeleteAccountDialog, setOpenDeleteAccountDialog] = useState(false);
 
   const handleChange = (
     name: string,
@@ -39,7 +39,7 @@ const EditAccountInformation = ({ id }: { id: string }) => {
   };
 
   const handleDeleteAccount = async () => {
-    setOpenDeleteAcountDialog(true);
+    setOpenDeleteAccountDialog(true);
   };
 
   const handleUpdateAccount = async () => {
@@ -53,7 +53,7 @@ const EditAccountInformation = ({ id }: { id: string }) => {
 
     try {
       const response = await axios.put(
-        `${domin_name}/api/users/profile/${id}`,
+        `${domain_name}/api/users/profile/${id}`,
         {
           username:
             userData.username !== originalData.username
@@ -61,7 +61,7 @@ const EditAccountInformation = ({ id }: { id: string }) => {
               : undefined,
           email:
             userData.email !== originalData.email ? userData.email : undefined,
-        }
+        },
       );
 
       // If username was updated, update the token in cookie
@@ -89,7 +89,9 @@ const EditAccountInformation = ({ id }: { id: string }) => {
 
   const fetchUserData = async () => {
     try {
-      const response = await axios.get(`${domin_name}/api/users/profile/${id}`);
+      const response = await axios.get(
+        `${domain_name}/api/users/profile/${id}`,
+      );
 
       const data = {
         username: response.data.message.username,
@@ -119,10 +121,10 @@ const EditAccountInformation = ({ id }: { id: string }) => {
         open={openPasswordDialog}
         setOpen={setOpenPasswordDialog}
       />
-      <DeleteAcountDialog
+      <DeleteAccounttDialog
         id={id}
-        open={openDeleteAcountDialog}
-        setOpen={setOpenDeleteAcountDialog}
+        open={openDeleteAccountDialog}
+        setOpen={setOpenDeleteAccountDialog}
       />
       <Toaster position="top-right" richColors />
       <Typography variant="h4" component="h1" gutterBottom>

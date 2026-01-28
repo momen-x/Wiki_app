@@ -1,11 +1,11 @@
 import axios from "axios";
-import { domin_name } from "./DOMIN";
+import { domain_name } from "./Domain";
 
 export const editComment = async (commentId: number, text: string) => {
   let error = "";
   try {
-    await axios.put(`${domin_name}/api/comments/${commentId}`, {text:text});
-    console.log("ubdated");
+    await axios.put(`${domain_name}/api/comments/${commentId}`, { text: text });
+    console.log("updated");
     error = "hi";
   } catch (error) {
     console.log(error);

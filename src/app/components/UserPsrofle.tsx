@@ -1,5 +1,5 @@
 "use client";
-import { domin_name } from "@/app/utils/DOMIN";
+import { domain_name } from "@/app/utils/Domain";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -39,18 +39,18 @@ const UserProfile = ({ id }: IParams) => {
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState<IUserProfile | null>(null);
-const router=useRouter();
+  const router = useRouter();
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          `${domin_name}/api/users/profile/${id}`
+          `${domain_name}/api/users/profile/${id}`,
         );
 
         if (!response.data) {
           throw new Error(
-            `Failed to fetch profile. Status: ${response.status}`
+            `Failed to fetch profile. Status: ${response.status}`,
           );
         }
 
@@ -59,7 +59,7 @@ const router=useRouter();
       } catch (err) {
         console.error("Error fetching user profile:", err);
         setError(
-          err instanceof Error ? err : new Error("An unknown error occurred")
+          err instanceof Error ? err : new Error("An unknown error occurred"),
         );
       } finally {
         setLoading(false);
@@ -87,7 +87,7 @@ const router=useRouter();
           </h1>
           <p className="text-gray-600">{error.message}</p>
           <button
-            onClick={() =>router.refresh() }
+            onClick={() => router.refresh()}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
           >
             Try Again
@@ -122,7 +122,7 @@ const router=useRouter();
           <div>
             <p className="text-sm text-gray-500">Member Since</p>
             <p className="text-lg font-medium">
-             {new Date(userData.createdAt).toLocaleDateString()}
+              {new Date(userData.createdAt).toLocaleDateString()}
             </p>
           </div>
         </div>

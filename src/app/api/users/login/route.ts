@@ -1,10 +1,9 @@
-import { ILogin } from "@/app/utils/bodyPostREquestType/bodyPostREquestType";
-import { LoginDto } from "@/app/utils/SchemaDto";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";     // ✅ or wherever your prisma.ts lives
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { serialize } from "cookie";
+import LoginSchema, { LoginSchemaType } from "@/app/(Modules)/(user)/login/_Validations/LoginValidation";
 
 /**
  * @method POST
@@ -14,8 +13,8 @@ import { serialize } from "cookie";
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = (await request.json()) as ILogin;
-    const validation = LoginDto.safeParse(body);
+    const body = (await request.json()) as LoginSchemaType;
+    const validation = LoginSchema.safeParse(body);
 
     if (!validation.success) {
       return NextResponse.json(

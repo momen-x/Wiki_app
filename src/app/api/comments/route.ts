@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";     // ✅ or wherever your prisma.ts lives
-import { verifyToken } from "@/app/utils/verifyToken"; // Adjust path as needed
-import { ICreateComment } from "@/app/utils/bodyPostREquestType/bodyPostREquestType";
-import { CreateCommentDto } from "@/app/utils/SchemaDto";
+import { prisma } from "@/lib/prisma";    
+import { verifyToken } from "@/app/utils/verifyToken"; 
+import CreateCommentSchema, { CreateCommentSchemaType } from "@/app/(Modules)/article/_Validation/CreateAndEditComment";
 
 
 
@@ -23,8 +22,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = (await request.json()) as ICreateComment;
-    const validation = CreateCommentDto.safeParse(body);
+    const body = (await request.json()) as CreateCommentSchemaType;
+    const validation = CreateCommentSchema.safeParse(body);
 
     if (!validation.success) {
       return NextResponse.json(

@@ -1,7 +1,7 @@
 "use client"
 import axios from "axios";
 import { useState } from "react";
-import { domin_name } from "../utils/DOMIN";
+import { domain_name } from "../utils/Domain";
 import { toast } from "sonner";
 import {
   Button,
@@ -48,39 +48,38 @@ const DeleteAcountDialog = ({
     return valid;
   };
 
-const handlDeleteAcount = async () => {
-  if (!validateForm()) return;
+  const handlDeleteAcount = async () => {
+    if (!validateForm()) return;
 
-  try {
-    const response = await axios.delete(
-      `${domin_name}/api/users/profile/${id}`,
-      {
-        headers: {
-          'X-Password': password
+    try {
+      const response = await axios.delete(
+        `${domain_name}/api/users/profile/${id}`,
+        {
+          headers: {
+            "X-Password": password,
+          },
+        },
+      );
+
+      toast.success("Account deleted successfully");
+      handleClose();
+      // Redirect to home or login page after deletion
+      // window.location.href = '/';
+      router.push("/");
+    } catch (error: any) {
+      if (error.response) {
+        const message =
+          error.response.data.message || "Failed to delete account";
+        if (message.toLowerCase().includes("password")) {
+          setErrors(message);
+        } else {
+          toast.error(message);
         }
-      }
-    );
-
-    toast.success("Account deleted successfully");
-    handleClose();
-    // Redirect to home or login page after deletion
-    // window.location.href = '/';
-    router.push("/");
-
-    
-  } catch (error: any) {
-    if (error.response) {
-      const message = error.response.data.message || "Failed to delete account";
-      if (message.toLowerCase().includes("password")) {
-        setErrors(message);
       } else {
-        toast.error(message);
+        toast.error("Network error. Please try again.");
       }
-    } else {
-      toast.error("Network error. Please try again.");
     }
-  }
-};
+  };
 
   return (
     <Dialog open={open} onClose={handleClose}>

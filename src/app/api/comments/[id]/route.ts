@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/app/utils/verifyToken";
-import { prisma } from "@/lib/prisma";     // ✅ or wherever your prisma.ts lives
+import { prisma } from "@/lib/prisma";    
 import { z } from 'zod';
+import { UpdateCommentSchema } from "@/app/(Modules)/article/_Validation/CreateAndEditComment";
 interface Iprops {
   params: Promise<{ id: string }>;
 }
@@ -23,7 +24,7 @@ export async function PUT(request: NextRequest, { params }: Iprops) {
     const id = +(await params).id;
     if (isNaN(id)) {
       return NextResponse.json(
-        { message: "the id is  uscorrect" },
+        { message: "the id is  incorrect" },
         { status: 400 }
       );
     }
@@ -35,7 +36,7 @@ export async function PUT(request: NextRequest, { params }: Iprops) {
       );
     }
     const body = (await request.json()) as IEditComment;
-    const validation = EditCommentDto.safeParse(body);
+    const validation = UpdateCommentSchema.safeParse(body);
     if (!validation.success) {
       return NextResponse.json(
         { message: validation.error.issues[0].message },
@@ -49,14 +50,14 @@ export async function PUT(request: NextRequest, { params }: Iprops) {
         { status: 403 }
       );
     }
-    const ubdateComment = await prisma.comment.update({
+    const updateComment = await prisma.comment.update({
       where: { id },
       data: { text: body.text }, // or { text: body.text } if you only want to update the text
     });
     return NextResponse.json(
       {
         message: "Comment updated",
-        comment: ubdateComment,
+        comment: updateComment,
       },
       { status: 200 }
     );
@@ -78,7 +79,7 @@ export async function DELETE(request: NextRequest, { params }: Iprops) {
   try {
     const id = +(await params).id;
     if (isNaN(id)) {
-      NextResponse.json({ message: "the id is  uscorrect" }, { status: 400 });
+      NextResponse.json({ message: "the id is  incorrect" }, { status: 400 });
     }
     const Comment = await prisma.comment.findUnique({ where: { id } });
     if (!Comment) {

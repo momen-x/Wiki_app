@@ -1,20 +1,22 @@
 import axios from "axios";
-import { domin_name } from "./DOMIN";
+import { domain_name } from "./Domain";
 
 export const EditArticle = async (
   title: string,
   description: string,
-  id: number
+  id: number,
+  userId:number
 ) => {
   try {
-    const response = await axios.put(`${domin_name}/api/articles/${id}`, {
+    const response = await axios.put(`${domain_name}/api/articles/${id}`, {
       title: title,
       description: description,
+      userId:userId,
     });
     console.log("updated");
     return response.data;
   } catch (error) {
     console.error("Error updating article:", error);
-    throw error; // Re-throw the error so it can be caught by the component
+    throw error; 
   }
 };

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import cloude from "./images/cloud&host.png";
+import cloud from "@/app/images/cloud&host.png";
 
 // Force dynamic rendering to avoid prerendering issues
 export const dynamic = 'force-dynamic';
@@ -30,7 +30,7 @@ export default function Home() {
         </div>
 
         <Image
-          src={cloude}
+          src={cloud}
           alt="cloud hosting photo"
           width={250}
           height={0}

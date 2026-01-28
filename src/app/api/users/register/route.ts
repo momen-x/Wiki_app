@@ -1,21 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";     // ✅ or wherever your prisma.ts lives
-import { IRegister } from "@/app/utils/bodyPostREquestType/bodyPostREquestType";
-import { RegisterAcount } from "@/app/utils/SchemaDto";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { serialize } from "cookie";
+import RegisterSchema, { RegisterSchemaType } from "@/app/(Modules)/(user)/register/_Validation/LoginValidation";
 
 /**
  * @method POST
  * @route ~/api/users/register
- * @description creeate new acount (register , sign up)
+ * @description create new account (register , sign up)
  * @access public
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = (await request.json()) as IRegister;
-    const validation = RegisterAcount.safeParse(body);
+    const body = (await request.json()) as RegisterSchemaType;
+    const validation = RegisterSchema.safeParse(body);
 
     if (!validation.success) {
       return NextResponse.json(
@@ -29,7 +28,7 @@ export async function POST(request: NextRequest) {
     });
     if (user || user1) {
       return NextResponse.json(
-        { message: "this user alreday registerd" },
+        { message: "this user already registered" },
         { status: 400 }
       );
     }

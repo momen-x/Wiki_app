@@ -1,13 +1,12 @@
-import { prisma } from "@/lib/prisma";     // ✅ or wherever your prisma.ts lives
-// import { error, log } from "console";
+import { prisma } from "@/lib/prisma";     
 import { NextRequest, NextResponse } from "next/server";
 
 interface Iprops {
   params: Promise<{ id: string }>;
 }
-import { IEditArticle } from "@/app/utils/SchemaDto";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { verifyToken } from "@/app/utils/verifyToken";
+import { UpdateArticleSchema } from "@/app/(Modules)/article/_Validation/CreateAndEditArticleSchema";
 /**
  *@method GEt
  * @route ~/api/articles/:id
@@ -46,7 +45,7 @@ export async function GET(request: NextRequest, { params }: Iprops) {
 /**
  *@method PUT
  * @route ~/api/articles/:id
- * @desc Edit  article by user themself
+ * @desc Edit  article by user themselves
  * @access private
  */
 export async function PUT(request: NextRequest, { params }: Iprops) {
@@ -56,7 +55,7 @@ export async function PUT(request: NextRequest, { params }: Iprops) {
       return NextResponse.json({ error: "Article not found" }, { status: 404 });
     }
     const body = await request.json();
-    const validation = IEditArticle.safeParse(body);
+    const validation = UpdateArticleSchema.safeParse(body);
     if (!validation.success) {
       return NextResponse.json(
         { message: validation.error.issues[0].message },
@@ -99,7 +98,7 @@ export async function PUT(request: NextRequest, { params }: Iprops) {
 /**
  * @method DELETE
  * @route ~/api/articles/:id
- * @desc Delete article by user themself or by admin
+ * @desc Delete article by user themselves or by admin
  * @access private
  */
 export async function DELETE(request: NextRequest, { params }: Iprops) {

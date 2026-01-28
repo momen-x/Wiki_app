@@ -1,9 +1,9 @@
 // app/api/article/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";     // ✅ or wherever your prisma.ts lives
-import { createArticleSchema } from "@/app/utils/SchemaDto";
 import { verifyToken } from "@/app/utils/verifyToken";
 import { Article_In_All_Page } from "../../utils/CountOfArticleInPage";
+import CreateArticleSchema from "@/app/(Modules)/article/_Validation/CreateAndEditArticleSchema";
 
 interface IArticleDto {
   title: string;
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
     if (decoded.id !== body.userId) {
       return NextResponse.json({ message: "Invalid token." }, { status: 401 });
     }
-    const validation = createArticleSchema.safeParse(body);
+    const validation = CreateArticleSchema.safeParse(body);
     if (!validation.success) {
       return NextResponse.json(
         { message: validation.error.issues[0].message },

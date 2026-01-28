@@ -3,10 +3,10 @@
 import { Button } from "@mui/material";
 import axios from "axios";
 import React, { useState } from "react";
-import { domin_name } from "../utils/DOMIN";
+import { domain_name } from "../utils/Domain";
 import { useRouter } from "next/navigation";
-import EditArticleDialog from "./EditArticleDialog";
-import EditCommentDialog from "./EditCommentDialog";
+import EditArticleDialog from "../(Modules)/article/[id]/_Components/EditArticleDialog";
+import EditCommentDialog from "../(Modules)/article/_CommentsComponent/EditCommentDialog";
 
 const AdminDeleteAndEditButton = ({
   id,
@@ -17,15 +17,15 @@ const AdminDeleteAndEditButton = ({
   description,
 }: any) => {
   const router = useRouter();
-  const [openEditArticleDialpg, setopenEditArticleDialpg] = useState(false);
-  const [openEditCommentDialpg, setopenEditCommentDialpg] = useState(false);
+  const [openEditArticleDialog, setOpenEditArticleDialog] = useState(false);
+  const [openEditCommentDialog, setOpenEditCommentDialog] = useState(false);
 
   const handleDelete = async () => {
     if (commentId) {
       try {
         if (confirm("are u sure u want delete this comment")) {
           const response = await axios.delete(
-            `${domin_name}/api/comments/${commentId}`
+            `${domain_name}/api/comments/${commentId}`,
           );
 
           router.refresh();
@@ -37,7 +37,7 @@ const AdminDeleteAndEditButton = ({
     if (articleId) {
       try {
         if (confirm("are u sure u want delete this article")) {
-          await axios.delete(`${domin_name}/api/articles/${articleId}`);
+          await axios.delete(`${domain_name}/api/articles/${articleId}`);
 
           router.refresh();
         }
@@ -49,9 +49,9 @@ const AdminDeleteAndEditButton = ({
 
   const handleEditComment = () => {
     if (articleId) {
-      setopenEditArticleDialpg(true);
+      setOpenEditArticleDialog(true);
     } else if (commentId) {
-      setopenEditCommentDialpg(true);
+      setOpenEditCommentDialog(true);
     }
   };
 
@@ -60,17 +60,18 @@ const AdminDeleteAndEditButton = ({
       <EditArticleDialog
         props={{
           id: articleId,
-          open: openEditArticleDialpg,
-          setOpen: setopenEditArticleDialpg,
+          open: openEditArticleDialog,
+          setOpen: setOpenEditArticleDialog,
           title: title,
           description: description,
+          userId: userId,
         }}
       />
       <EditCommentDialog
         props={{
           id: commentId,
-          open: openEditCommentDialpg,
-          setOpen: setopenEditCommentDialpg,
+          open: openEditCommentDialog,
+          setOpen: setOpenEditCommentDialog,
         }}
       />
       {id === userId ? (

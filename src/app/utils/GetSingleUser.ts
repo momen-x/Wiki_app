@@ -1,7 +1,7 @@
 import axios from "axios";
-import { domin_name } from "./DOMIN";
+import { domain_name } from "./Domain";
 
 export const GetSingleUser = async (id: any) => {
-  const response = await axios.get(`${domin_name}/api/users/profile/${id}`);
+  const response = await axios.get(`${domain_name}/api/users/profile/${id}`);
   console.log(response.data);
 };

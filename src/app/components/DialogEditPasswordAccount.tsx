@@ -7,7 +7,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import axios from "axios";
-import { domin_name } from "../utils/DOMIN";
+import { domain_name } from "../utils/Domain";
 import { toast } from "sonner";
 
 interface PasswordDialogProps {
@@ -77,12 +77,11 @@ const DialogEditPasswordAccount = ({ id, open, setOpen }: PasswordDialogProps) =
 
     try {
       const response = await axios.put(
-        `${domin_name}/api/users/profile/${id}`,
+        `${domain_name}/api/users/profile/${id}`,
         {
           oldPassword: passwords.oldPassword,
           password: passwords.newPassword,
         },
-       
       );
 
       toast.success("Password updated successfully");
