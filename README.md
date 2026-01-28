@@ -37,7 +37,7 @@ A modern, full-featured wiki application where users can create, read, edit, and
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js 18.x or higher
+- Node.js 18.x 
 - npm or yarn package manager
 - Database PostgreSQL
 
