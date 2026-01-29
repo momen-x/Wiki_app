@@ -2,13 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/app/utils/verifyToken";
 import { prisma } from "@/lib/prisma";    
 import { z } from 'zod';
-import { UpdateCommentSchema } from "@/app/(Modules)/article/_Validation/CreateAndEditComment";
-interface Iprops {
+import { UpdateCommentSchema, UpdateCommentSchemaType } from "@/app/(Modules)/_Comments/Validation/CreateAndEditComment";
+interface IProps {
   params: Promise<{ id: string }>;
 }
- interface IEditComment {
-  text: string;
-}
+
 
 export const EditCommentDto = z.object({
   text: z.string().min(1),
@@ -19,7 +17,7 @@ export const EditCommentDto = z.object({
  * @description edit comment by  writer this comment
  * @access private
  */
-export async function PUT(request: NextRequest, { params }: Iprops) {
+export async function PUT(request: NextRequest, { params }: IProps) {
   try {
     const id = +(await params).id;
     if (isNaN(id)) {
@@ -35,7 +33,7 @@ export async function PUT(request: NextRequest, { params }: Iprops) {
         { status: 404 }
       );
     }
-    const body = (await request.json()) as IEditComment;
+    const body = (await request.json()) as UpdateCommentSchemaType;
     const validation = UpdateCommentSchema.safeParse(body);
     if (!validation.success) {
       return NextResponse.json(
@@ -75,7 +73,7 @@ export async function PUT(request: NextRequest, { params }: Iprops) {
  * @description delete comment by writer comment or by admin
  * @access private
  */
-export async function DELETE(request: NextRequest, { params }: Iprops) {
+export async function DELETE(request: NextRequest, { params }: IProps) {
   try {
     const id = +(await params).id;
     if (isNaN(id)) {

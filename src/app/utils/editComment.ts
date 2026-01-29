@@ -5,11 +5,10 @@ export const editComment = async (commentId: number, text: string) => {
   let error = "";
   try {
     await axios.put(`${domain_name}/api/comments/${commentId}`, { text: text });
-    console.log("updated");
     error = "hi";
   } catch (error) {
-    console.log(error);
-    console.log("error");
+    console.error(error);
+
     error = error;
   }
   return error;

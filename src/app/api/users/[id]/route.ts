@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";     // ✅ or wherever your prisma.ts lives
-interface Iprops {
+interface IProps {
   params: Promise<{ id: string }>;
 }
 
@@ -10,8 +10,7 @@ interface Iprops {
  * @description Get username (only logged-in user can see their own account)
  * @access private
  */
-export async function GET(request: NextRequest, { params }: Iprops) {
-  console.log("i am here");
+export async function GET(request: NextRequest, { params }: IProps) {
   
   try {
     const id = +(await params).id;
@@ -20,7 +19,6 @@ export async function GET(request: NextRequest, { params }: Iprops) {
     }
 
     const jwtToken = request.cookies.get("token")?.value;
-    console.log("jjjjj : ", jwtToken);
 
     if (!jwtToken) {
       return NextResponse.json(

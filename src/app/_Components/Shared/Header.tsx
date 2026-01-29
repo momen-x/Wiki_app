@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from "next/link";
 import Image from "next/image";
-import cloud from "@/app/images/cloud.png";
+import wikiLogo from "@/app/images/wikiLogo.png";
 import { verifyTokenForPage } from "@/app/utils/verifyToken";
 import { MobileMenu } from "@/app/_Components/Shared/MobileMenu";
 import { AuthButtons } from "@/app/_Components/Shared/AuthButtons";
@@ -41,23 +41,25 @@ const Header = async () => {
     <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/95 backdrop-blur supports-backdrop-filter:bg-white/60 dark:border-gray-800 dark:bg-gray-950/95">
       <div className="container mx-auto px-4">
         <nav className="flex h-16 items-center justify-between">
-          
           {/* Logo */}
           <div className="flex items-center space-x-3">
-            <Link href="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+            <Link
+              href="/"
+              className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
+            >
               <div className="relative h-10 w-10 overflow-hidden rounded-lg   flex items-center justify-center">
                 <Image
-                  src={cloud}
+                  src={wikiLogo}
                   alt="Cloud Hosting Logo"
                   width={32}
                   height={32}
-                  className="object-contain"
+                  className="object-contain rounded-full"
                   priority
                 />
               </div>
               <div className="hidden sm:block">
                 <span className="text-xl font-bold bg-linear-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  CloudHosting
+                  Wiki
                 </span>
               </div>
             </Link>
@@ -88,10 +90,10 @@ const Header = async () => {
             <div className="hidden sm:block">
               <ModeToggleBtn />
             </div>
-            
+
             {/* Auth Buttons */}
             <AuthButtons payload={payload} username={payload?.username} />
-            
+
             {/* Mobile Menu */}
             <div className="md:hidden flex items-center space-x-3">
               <ModeToggleBtn />

@@ -1,16 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";     // ✅ or wherever your prisma.ts lives
+import { prisma } from "@/lib/prisma";     
 import jwt, { JwtPayload } from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
 
-interface IPassword {
-  password: string;
-}
+
 
 const TOKEN_COOKIE_NAME = "token";
 
-interface Iprops {
+interface IProps {
   params: Promise<{ id: string }>;
 }
 /**
@@ -19,7 +17,7 @@ interface Iprops {
  * @description Delete account by user themselves
  * @access private
  */
-export async function DELETE(request: NextRequest, { params }: Iprops) {
+export async function DELETE(request: NextRequest, { params }: IProps) {
   try {
     const id = +(await params).id;
     if (isNaN(id)) {
@@ -55,7 +53,6 @@ export async function DELETE(request: NextRequest, { params }: Iprops) {
       );
     }
 
-    // For DELETE requests, consider getting password from headers or URL params
     const password = request.headers.get("X-Password");
     if (!password) {
       return NextResponse.json(
@@ -105,7 +102,7 @@ export async function DELETE(request: NextRequest, { params }: Iprops) {
  * @description Get profile by id , just loged user can see your acount
  * @access public
  */
-export async function GET(request: NextRequest, { params }: Iprops) {
+export async function GET(request: NextRequest, { params }: IProps) {
   try {
     const id = +(await params).id;
     if (isNaN(id)) {
@@ -163,7 +160,7 @@ export async function GET(request: NextRequest, { params }: Iprops) {
  * @description edit account by user themselves
  * @access private
  */
-export async function PUT(request: NextRequest, { params }: Iprops) {
+export async function PUT(request: NextRequest, { params }: IProps) {
   try {
     const id = +(await params).id;
     if (isNaN(id)) {

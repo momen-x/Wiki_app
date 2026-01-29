@@ -65,7 +65,7 @@ const EditArticleDialog = ({ props }: IProps) => {
 
   return (
     <Dialog open={props.open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-125">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-gray-800">
             Update Article

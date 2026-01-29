@@ -13,7 +13,6 @@ export const EditArticle = async (
       description: description,
       userId:userId,
     });
-    console.log("updated");
     return response.data;
   } catch (error) {
     console.error("Error updating article:", error);

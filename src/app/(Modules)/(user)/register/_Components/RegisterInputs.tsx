@@ -12,7 +12,9 @@ import ValidationInput from "@/app/_Components/Inputs/ValidationInput";
 import { Button } from "@/app/_Components/ui/button";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
-import RegisterSchema, { RegisterSchemaType } from "../_Validation/LoginValidation";
+import RegisterSchema, {
+  RegisterSchemaType,
+} from "../_Validation/RegisterValidation";
 
 const LoginInput = () => {
   const form = useForm<RegisterSchemaType>({

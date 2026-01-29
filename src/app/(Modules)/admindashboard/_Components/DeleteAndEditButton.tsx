@@ -1,21 +1,25 @@
 "use client";
 
-import { Button } from "@mui/material";
 import axios from "axios";
 import React, { useState } from "react";
-import { domain_name } from "../utils/Domain";
+import { domain_name } from "../../../utils/Domain";
 import { useRouter } from "next/navigation";
-import EditArticleDialog from "../(Modules)/article/[id]/_Components/EditArticleDialog";
-import EditCommentDialog from "../(Modules)/article/_CommentsComponent/EditCommentDialog";
+import EditArticleDialog from "../../article/[id]/_Components/EditArticleDialog";
+import EditCommentDialog from "@/app/(Modules)/_Comments/Components/EditCommentDialog";
+import { Button } from "../../../_Components/ui/button";
 
-const AdminDeleteAndEditButton = ({
+
+const DeleteAndEditButton = ({
   id,
   userId,
   commentId,
   articleId,
   title,
   description,
-}: any) => {
+  commentText
+
+
+}:{id:number,userId:number,commentId?:number,articleId?:number,title?:string,description?:string,commentText?:string} ) => {
   const router = useRouter();
   const [openEditArticleDialog, setOpenEditArticleDialog] = useState(false);
   const [openEditCommentDialog, setOpenEditCommentDialog] = useState(false);
@@ -59,26 +63,23 @@ const AdminDeleteAndEditButton = ({
     <React.Fragment>
       <EditArticleDialog
         props={{
-          id: articleId,
+          id: articleId||0,
           open: openEditArticleDialog,
           setOpen: setOpenEditArticleDialog,
-          title: title,
-          description: description,
+          title: title ||"",
+          description: description||"",
           userId: userId,
         }}
       />
       <EditCommentDialog
-        props={{
-          id: commentId,
-          open: openEditCommentDialog,
-          setOpen: setOpenEditCommentDialog,
-        }}
+       
+    open={openEditCommentDialog} setOpen={setOpenEditCommentDialog}  id={commentId||0} text={commentText||""}
       />
+    
       {id === userId ? (
         <Button
-          variant="contained"
+          variant="default"
           color="primary"
-          sx={{ mx: "5px" }}
           onClick={handleEditComment}
         >
           Edit
@@ -86,11 +87,11 @@ const AdminDeleteAndEditButton = ({
       ) : (
         ""
       )}
-      <Button variant="contained" color="error" onClick={handleDelete}>
+      <Button variant="destructive" color="error" onClick={handleDelete} style={{ marginLeft:"8px" }}>
         Delete
       </Button>
     </React.Fragment>
   );
 };
 
-export default AdminDeleteAndEditButton;
+export default DeleteAndEditButton;

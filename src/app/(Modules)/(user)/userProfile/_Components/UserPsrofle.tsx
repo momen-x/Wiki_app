@@ -3,7 +3,8 @@ import { domain_name } from "@/app/utils/Domain";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-// import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "sonner";
+import { Button } from "../../../../_Components/ui/button";
 
 interface IParams {
   id: string;
@@ -80,18 +81,18 @@ const UserProfile = ({ id }: IParams) => {
   if (error) {
     return (
       <div className="container mx-auto px-4 py-8">
-        {/* <Toaster position="top-right" richColors /> */}
+        <Toaster position="top-right" richColors />
         <div className="bg-white rounded-lg shadow-md p-6 text-center">
           <h1 className="text-2xl font-bold text-red-600 mb-4">
             Error Loading Profile
           </h1>
           <p className="text-gray-600">{error.message}</p>
-          <button
+          <Button
             onClick={() => router.refresh()}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
           >
             Try Again
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -107,7 +108,6 @@ const UserProfile = ({ id }: IParams) => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* <Toaster position="top-right" richColors /> */}
 
       <h1 className="text-3xl font-bold text-gray-800 mb-10 mt-4">
         User Profile

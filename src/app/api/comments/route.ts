@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";    
 import { verifyToken } from "@/app/utils/verifyToken"; 
-import CreateCommentSchema, { CreateCommentSchemaType } from "@/app/(Modules)/article/_Validation/CreateAndEditComment";
+import CreateCommentSchema, {
+  CreateCommentSchemaType,
+} from "@/app/(Modules)/_Comments/Validation/CreateAndEditComment";
 
 
 

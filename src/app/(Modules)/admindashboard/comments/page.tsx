@@ -1,10 +1,10 @@
-import AdminDeleteAndEditButton from "@/app/components/AdminDeleteAndEditButton";
-import Drawar from "@/app/components/Drawar";
+import DeleteAndEditButton from "@/app/(Modules)/admindashboard/_Components/DeleteAndEditButton";
 import { domain_name } from "@/app/utils/Domain";
 import { verifyTokenForPage } from "@/app/utils/verifyToken";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-interface IComents {
+
+interface IComments {
   articleId: number;
   createdAt: Date;
   id: number;
@@ -13,10 +13,12 @@ interface IComents {
   user: { id: number; username: string; email: string };
   userId: number;
 }
+
 export default async function AdminCommentPage() {
   const cookieStore = cookies();
   const token = (await cookieStore)?.get("token");
   const payload = verifyTokenForPage(token?.value || "");
+
   if (!payload?.isAdmin) {
     redirect("/");
   }
@@ -27,77 +29,116 @@ export default async function AdminCommentPage() {
       Cookie: `token=${token?.value}`,
     },
   });
+
   if (!response.ok) {
     return;
   }
+
   let data = await response.json();
-  const comments: IComents[] = data.comments;
+  const comments: IComments[] = data.comments;
 
   return (
-    <Drawar username={payload?.username}>
-      <main className="flex min-h-screen  bg-gray-50 ml-50  w-9xl">
-        <div className="flex-1 overflow-auto">
-          <header className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white/90 px-4 py-3 backdrop-blur">
-            <h1 className="text-xl font-bold text-gray-800 sm:text-2xl">
-              Comments
-            </h1>
-          </header>
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
+                Comment Management
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">
+                Manage all comments in the system
+              </p>
+            </div>
+            <div className="px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
+              <p className="text-sm text-gray-700 dark:text-gray-300">
+                Total: <span className="font-semibold">{comments.length}</span>{" "}
+                comments
+              </p>
+            </div>
+          </div>
+        </div>
 
-          <section className="p-4 sm:p-6 lg:p-8">
-            <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
-              <table className="min-w-full divide-y divide-gray-200 text-sm">
-                <thead className="bg-gray-50 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                    Comment
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                    Author
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider hidden md:table-cell">
+                    Created at
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                {comments.length === 0 ? (
                   <tr>
-                    <th scope="col" className="px-3 py-3 sm:px-6">
-                      Comment
-                    </th>
-                    <th
-                      scope="col"
-                      className="hidden md:table-cell px-3 py-3 sm:px-6"
-                    >
-                      Created at
-                    </th>
-                    <th scope="col" className="px-3 py-3 text-right sm:px-6">
-                      Actions
-                    </th>
+                    <td colSpan={4} className="px-6 py-12 text-center">
+                      <div className="text-gray-500 dark:text-gray-400">
+                        <p className="text-lg">No comments found</p>
+                        <p className="text-sm mt-1">
+                          Comments will appear here once users start commenting
+                        </p>
+                      </div>
+                    </td>
                   </tr>
-                </thead>
-
-                <tbody className="divide-y divide-gray-100">
-                  {comments.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan={3}
-                        className="px-3 py-10 text-center text-gray-500 sm:px-6"
-                      >
-                        No comments yet.
+                ) : (
+                  comments.map((c) => (
+                    <tr
+                      key={c.id}
+                      className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                    >
+                      <td className="px-6 py-4">
+                        <div className="max-w-md">
+                          <p className="text-gray-800 dark:text-white">
+                            {c.text}
+                          </p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col">
+                          <span className="text-gray-800 dark:text-white font-medium">
+                            {c.user.username}
+                          </span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            {c.user.email}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-gray-600 dark:text-gray-400 hidden md:table-cell">
+                        {new Date(c.createdAt).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </td>
+                      <td className="px-6 py-4">
+                        <DeleteAndEditButton
+                          id={payload?.id}
+                          userId={c.userId}
+                          commentId={c.id}
+                          commentText={c.text}
+                        />
                       </td>
                     </tr>
-                  ) : (
-                    comments.map((c) => (
-                      <tr key={c.id} className="hover:bg-gray-50">
-                        <td className="whitespace-normal px-3 py-4 text-gray-800 sm:px-6">
-                          {c.text}
-                        </td>
-                        <td className="hidden whitespace-nowrap px-3 py-4 text-gray-600 md:table-cell sm:px-6">
-                          {new Date(c.createdAt).toLocaleDateString()}
-                        </td>
-                        <td className="whitespace-nowrap px-3 py-4 text-right text-xs font-medium sm:px-6">
-                          <AdminDeleteAndEditButton
-                            id={payload?.id}
-                            userId={c.userId}
-                            commentId={c.id}
-                          />
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </section>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </main>
-    </Drawar>
+      </div>
+    </main>
   );
 }

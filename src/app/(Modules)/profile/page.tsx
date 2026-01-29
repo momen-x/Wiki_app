@@ -1,13 +1,13 @@
 import { cookies } from "next/headers";
 import React from "react";
 import { Toaster } from "sonner";
-
-import TuneTwoToneIcon from "@mui/icons-material/TuneTwoTone";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { verifyTokenForPage } from "@/app/utils/verifyToken";
 import { domain_name } from "@/app/utils/Domain";
-import AdminDeleteAndEditButton from "@/app/components/AdminDeleteAndEditButton";
+import DeleteAndEditButton from "@/app/(Modules)/admindashboard/_Components/DeleteAndEditButton";
+import { Button } from "@/app/_Components/ui/button";
+import { FolderLock } from "lucide-react";
 
 interface ICommentOnArticlesUser {
   text: string;
@@ -63,21 +63,25 @@ const ProfilePage = async () => {
 
     return (
       <div className="container mx-auto px-4 py-8 ">
-        <Link
-          href={"/profile/profileSettings"}
-          className="bg-sky-300 p-3  my-3.5 rounded-xl "
-        >
-          Privacy settings : <TuneTwoToneIcon />
-        </Link>
         <Toaster position="top-right" richColors />
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-10 mt-4">
+            User Profile
+          </h1>
+          <Link
+            href={"/profile/profileSettings"}
+            className="bg-sky-300 text-sky-800  dark:text-sky-100 p-3  dark:bg-sky-600 my-3.5 rounded-xl "
+          >
+            Privacy settings : <FolderLock size={18} />
+          </Link>
+        </div>
 
-        <h1 className="text-3xl font-bold text-gray-800 mb-10 mt-4">
-          User Profile
-        </h1>
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div>
-              <p className="text-sm text-gray-500">Username</p>
+              <p className="text-sm text-gray-500 dark-text-gray-200">
+                Username
+              </p>
               <p className="text-lg font-medium">{data.username}</p>
             </div>
             <div>
@@ -89,10 +93,12 @@ const ProfilePage = async () => {
           </div>
         </div>
 
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Your Articles</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-6 dark:text-gray-200">
+          Your Articles
+        </h2>
 
         {data.articles.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-md p-6 text-center">
+          <div className="bg-white dark:bg-gray-600 rounded-lg shadow-md p-6 text-center">
             <p className="text-gray-500">
               You haven't written any articles yet.
             </p>
@@ -102,22 +108,25 @@ const ProfilePage = async () => {
             {data.articles.map((article) => (
               <div
                 key={article.id}
-                className="bg-white rounded-lg shadow-md overflow-hidden"
+                className="bg-white dark:bg-gray-800 p-4 mb:rounded-lg shadow-md overflow-hidden"
               >
                 <div className="w-4xl mx-4 h-28 ">
-                  <AdminDeleteAndEditButton
-                    id={payload?.id}
-                    userId={payload?.id}
+                  <DeleteAndEditButton
+                    id={payload?.id || 0}
+                    userId={payload?.id || 0}
                     articleId={article.id}
                     title={article.title}
                     description={article.description}
+                    commentText={article.comments[0]?.text || ""}
                   />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">
+                  <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">
                     {article.title}
                   </h3>
-                  <p className="text-gray-600 mb-4">{article.description}</p>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">
+                    {article.description}
+                  </p>
                   <p className="text-sm text-gray-400">
                     Last updated: {new Date(article.updatedAt).toLocaleString()}
                   </p>
@@ -125,16 +134,18 @@ const ProfilePage = async () => {
 
                 {article.comments.length > 0 && (
                   <div className="border-t border-gray-100 p-6 bg-gray-50">
-                    <h4 className="font-medium text-gray-700 mb-3">
+                    <h4 className="font-medium text-gray-700 dark:text-gray-200 mb-3">
                       Comments ({article.comments.length})
                     </h4>
                     <div className="space-y-3">
                       {article.comments.map((comment) => (
                         <div
                           key={comment.id}
-                          className="bg-white p-3 rounded-md shadow-sm"
+                          className="bg-white  dark:bg-gray-800 rounded-lg p-3 shadow-sm"
                         >
-                          <p className="text-gray-800">{comment.text}</p>
+                          <p className="text-gray-800 dark:text-gray-200 mb-1">
+                            {comment.text}
+                          </p>
                           <p className="text-xs text-gray-400 mt-1">
                             Posted on{" "}
                             {new Date(comment.createdAt).toLocaleString()}
@@ -164,12 +175,12 @@ const ProfilePage = async () => {
               ? error.message
               : "An unknown error occurred"}
           </p>
-          <button
+          <Button
             // onClick={() =>router.refresh() }
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
           >
             Try Again
-          </button>
+          </Button>
         </div>
       </div>
     );

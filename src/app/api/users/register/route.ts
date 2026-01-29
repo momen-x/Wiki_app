@@ -3,7 +3,9 @@ import { prisma } from "@/lib/prisma";     // ✅ or wherever your prisma.ts liv
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { serialize } from "cookie";
-import RegisterSchema, { RegisterSchemaType } from "@/app/(Modules)/(user)/register/_Validation/LoginValidation";
+import RegisterSchema, {
+  RegisterSchemaType,
+} from "@/app/(Modules)/(user)/register/_Validation/RegisterValidation";
 
 /**
  * @method POST

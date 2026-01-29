@@ -2,15 +2,10 @@ import { verifyTokenForPage } from "@/app/utils/verifyToken";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import React from "react";
+import EditAccountInformation from "./_Components/EditAccountInformation";
 
-import EditAcounInformation from "@/app/components/EditAcounInformation";
 
-interface IUserProfile {
-  id: number;
-  username: string;
-  email: string;
-  createdAt: string;
-}
+
 
 const SettingProfilePage = async () => {
   const cookieStore = cookies();
@@ -22,13 +17,12 @@ const SettingProfilePage = async () => {
     redirect("/");
   }
 
-  let userData: IUserProfile | null = null;
 
 
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-     <EditAcounInformation id={id} />
+     <EditAccountInformation id={id} />
     </div>
   );
 };

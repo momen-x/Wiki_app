@@ -1,10 +1,9 @@
 import React from "react";
-import { Box, Card } from "@mui/material";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { verifyTokenForPage } from "@/app/utils/verifyToken";
-import Drawar from '@/app/components/Drawar';
-import ArticleInputs from "../article/_Components/ArticleInputs";
+import CreateArticle from "../article/_Components/CreateArticle";
+
 
 const AdminPage = async () => {
   const cookieStore = cookies();
@@ -16,26 +15,23 @@ const AdminPage = async () => {
   }
   return (
     <div className="">
-      <Drawar username={payload?.username}>
-        <Box
-          sx={{ minWidth: 275 }}
-          className="flex justify-center items-center min-h-[calc(100vh-150px)] "
+      <div
+        className="flex justify-center items-center min-h-[calc(100vh-150px)] "
+      >
+        <div
+ 
+
+          style={{
+            width: "100%",
+            maxWidth: 800,
+            height: 400,
+            maxHeight: "100%",
+            padding: "16p",
+          }}
         >
-          <Card
-            className="bg-indigo-400"
-            variant="outlined"
-            sx={{
-              width: "100%",
-              maxWidth: 800,
-              height: 400,
-              maxHeight: "100%",
-              p: 4,
-            }}
-          >
-            <ArticleInputs id={payload?.id} />
-          </Card>
-        </Box>
-      </Drawar>
+          <CreateArticle id={payload.id} />
+        </div>
+      </div>
     </div>
   );
 };

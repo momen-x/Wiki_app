@@ -1,8 +1,9 @@
 import { cookies } from "next/headers";
 import Link from "next/link";
-import { Lock } from "lucide-react";
 import { verifyTokenForPage } from "@/app/utils/verifyToken";
-import ListOfArticles from "./_Components/ListOfArticles";
+import ListOfArticles from "@/app/(Modules)/article/_Components/ListOfArticles";
+import CreateArticle from "@/app/(Modules)/article/_Components/CreateArticle";
+import { Lock } from "lucide-react";
 
 const ArticlePage = async () => {
   const cookieStore = cookies();
@@ -54,12 +55,12 @@ const ArticlePage = async () => {
   return (
     <div className="min-h-screen py-8">
       <div className="container mx-auto px-4">
-        <h1 className="text-3xl font-bold  mb-8 text-center">
+        <CreateArticle id={payload?.id} />
+
+        <h1 className="text-3xl font-bold  m-8 text-center">
           Search for article
         </h1>
-        <ListOfArticles
-        id={payload?.id}
-          />
+        <ListOfArticles />
       </div>
     </div>
   );

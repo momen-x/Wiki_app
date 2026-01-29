@@ -1,13 +1,13 @@
 "use client";
-import { Button } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { domain_name } from "../../../../utils/Domain";
 import { useRouter } from "next/navigation";
-import AddCommentInputs from "../../_CommentsComponent/AddCommentInputs";
-import ListOfComments from "../../_CommentsComponent/ListOfComments";
 import Link from "next/link";
 import EditArticleDialog from "./EditArticleDialog";
+import AddCommentInputs from "@/app/(Modules)/_Comments/Components/AddCommentInputs";
+import ListOfComments from "@/app/(Modules)/_Comments/Components/ListOfComments";
+import { Button } from "@/app/_Components/ui/button";
 
 const ShowSingleArticle = ({ id, article, userId }: any) => {
   const router = useRouter();
@@ -18,7 +18,6 @@ const ShowSingleArticle = ({ id, article, userId }: any) => {
 
         router.push("/article?pageNumber=1");
       } catch (error) {
-        // console.log("error : ", error);
         return;
       }
     }
@@ -35,7 +34,6 @@ const ShowSingleArticle = ({ id, article, userId }: any) => {
         const userData = await response.data.message.username;
         setUsername(userData);
       } catch (error) {
-        // console.log(error);
         return;
       }
     };
@@ -65,15 +63,14 @@ const ShowSingleArticle = ({ id, article, userId }: any) => {
           Back to Articles
         </Link>
 
-        {/* Article Card */}
         <div className=" rounded-2xl shadow-lg overflow-hidden dark:bg-gray-800 bg-white">
           {article.userId === userId ? (
             <div className="mt-5 ml-3 w-2xl">
               {" "}
               <Button
-                variant="contained"
+                variant="default"
                 color="primary"
-                sx={{ marginX: "6px", width: "100px" }}
+                style={{ margin: "0 6px", width: "100px" }}
                 onClick={() => {
                   setOpen(true);
                 }}
@@ -81,9 +78,9 @@ const ShowSingleArticle = ({ id, article, userId }: any) => {
                 Edit
               </Button>
               <Button
-                variant="contained"
+                variant="destructive"
                 color="error"
-                sx={{ marginX: "6px", width: "100px" }}
+                style={{ margin: "0 6px", width: "100px" }}
                 onClick={handleDeleteArticle}
               >
                 Delete
@@ -117,7 +114,7 @@ const ShowSingleArticle = ({ id, article, userId }: any) => {
           </div>
         </div>
 
-        {/* Comments Section */}
+
         <div className="mt-12">
           <h2 className="text-2xl font-semibold  mb-6">
             Comments
