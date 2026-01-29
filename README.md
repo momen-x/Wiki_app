@@ -37,7 +37,7 @@ A modern, full-featured wiki application where users can create, read, edit, and
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js 18.x or higher
+- Node.js 18.x 
 - npm or yarn package manager
 - Database PostgreSQL
 
@@ -45,5 +45,10 @@ A modern, full-featured wiki application where users can create, read, edit, and
 
 1. **Clone the repository**
    ```bash
+<<<<<<< Updated upstream
    git clone https://github.com/momen-x/Wiki_app.git
    cd Wiki-app
+=======
+ git clone https://github.com/momen-x/Wiki_app.git
+cd Wiki-app
+>>>>>>> Stashed changes
