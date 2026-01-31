@@ -15,6 +15,7 @@ import { Loader2 } from "lucide-react";
 import RegisterSchema, {
   RegisterSchemaType,
 } from "../_Validation/RegisterValidation";
+import { useRegister } from "../Hooks/useRegister";
 
 const LoginInput = () => {
   const form = useForm<RegisterSchemaType>({
@@ -27,7 +28,11 @@ const LoginInput = () => {
       username: "",
     },
   });
-
+  const { mutate: registerUser } = useRegister(()=>{
+    toast.success("Registration successful");
+    window.location.reload();
+    router.replace("/")
+  });
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -35,21 +40,15 @@ const LoginInput = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(
-        `${domain_name}/api/users/register`,
-        {
-          email: form.getValues("email"),
-          password: form.getValues("password"),
-          username: form.getValues("username"),
-          confirmPassword: form.getValues("confirmPassword"),
-        }
-      );
-
-      if (response.data) {
-        toast.success("Login successful!");
-        router.replace("/");
-        router.refresh();
-      }
+       registerUser({
+        username: form.getValues("username"),
+        email: form.getValues("email"),
+        password: form.getValues("password"),
+        confirmPassword: form.getValues("confirmPassword"),
+      });
+      router.refresh();
+      router.replace("/")
+      toast.success("Registration successful");
     } catch (error: any) {
       if (error.response?.status === 401) {
         toast.error("Invalid email or password");
@@ -83,10 +82,7 @@ const LoginInput = () => {
 
           <CardContent>
             <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(submit)}
-                className="space-y-5"
-              >
+              <form onSubmit={form.handleSubmit(submit)} className="space-y-5">
                 <div className="space-y-4">
                   <ValidationInput<RegisterSchemaType>
                     fieldTitle="Username"
@@ -103,21 +99,21 @@ const LoginInput = () => {
                     className="h-12"
                   />
 
-                    <ValidationInput<RegisterSchemaType>
-                      fieldTitle="Password"
-                      nameInSchema="password"
-                      placeholder="Enter your password"
-                      type="password"
-                      className="h-12"
-                    />
-                    <ValidationInput<RegisterSchemaType>
-                      fieldTitle="Confirm Password"
-                      nameInSchema="confirmPassword"
-                      placeholder="Confirm your password"
-                      type="password"
-                      className="h-12"
-                    />
-                    {/* <div className="flex justify-end">
+                  <ValidationInput<RegisterSchemaType>
+                    fieldTitle="Password"
+                    nameInSchema="password"
+                    placeholder="Enter your password"
+                    type="password"
+                    className="h-12"
+                  />
+                  <ValidationInput<RegisterSchemaType>
+                    fieldTitle="Confirm Password"
+                    nameInSchema="confirmPassword"
+                    placeholder="Confirm your password"
+                    type="password"
+                    className="h-12"
+                  />
+                  {/* <div className="flex justify-end">
                       <Link 
                         href="/forgot-password" 
                         className="text-sm text-blue-600 hover:text-blue-800 hover:underline transition-colors"
@@ -125,8 +121,7 @@ const LoginInput = () => {
                         Forgot password?
                       </Link>
                     </div> */}
-                  </div>
-           
+                </div>
 
                 <Button
                   type="submit"
@@ -142,24 +137,21 @@ const LoginInput = () => {
                     "Sign Up"
                   )}
                 </Button>
-
-              
-             
               </form>
             </Form>
           </CardContent>
 
           <CardFooter className="flex flex-col space-y-4">
             <div className="text-center text-sm text-gray-600">
-            you have an account?{" "}
-              <Link 
-                href="/login" 
+              you have an account?{" "}
+              <Link
+                href="/login"
                 className="font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors"
               >
                 login to your account
               </Link>
             </div>
-            
+
             {/* <p className="text-xs text-center text-gray-400">
               By continuing, you agree to our{" "}
               <Link href="/terms" className="hover:underline">Terms</Link>{" "}

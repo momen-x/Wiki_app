@@ -1,69 +1,108 @@
+import { Suspense } from "react";
+import { domain_name } from "@/app/utils/Domain";
+import { Article_In_All_Page } from "@/app/utils/CountOfArticleInPage";
+import SearchForm from "./_Components/SearchForm";
+import ArticlesList from "./_Components/ArticlesList";
+import Pagination from "./_Components/Pagination";
 import { cookies } from "next/headers";
-import Link from "next/link";
 import { verifyTokenForPage } from "@/app/utils/verifyToken";
-import ListOfArticles from "@/app/(Modules)/article/_Components/ListOfArticles";
-import CreateArticle from "@/app/(Modules)/article/_Components/CreateArticle";
-import { Lock } from "lucide-react";
+import CreateArticle from "./_Components/CreateArticle";
 
-const ArticlePage = async () => {
+interface IArticleData {
+  userId: number;
+  id: number;
+  title: string;
+  description: string;
+}
+
+interface ArticlesResponse {
+  articles: IArticleData[];
+  total: number;
+  page: number;
+  totalPages: number;
+}
+
+interface ArticlesPageProps {
+  searchParams: { page?: string; search?: string };
+}
+
+async function fetchArticles(
+  page: number,
+  search?: string,
+): Promise<ArticlesResponse> {
+  try {
+    const url = new URL(`${domain_name}/api/articles`);
+    url.searchParams.set("page", page.toString());
+    url.searchParams.set("limit", Article_In_All_Page.toString());
+    if (search) {
+      url.searchParams.set("search", search);
+    }
+
+    const response = await fetch(url.toString(), {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch articles");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching articles:", error);
+    throw error;
+  }
+}
+
+export default async function ArticlesPage({
+  searchParams,
+}: ArticlesPageProps) {
   const cookieStore = cookies();
   const token = (await cookieStore)?.get("token");
   const payload = verifyTokenForPage(token?.value || "");
+  const currentPage = Number((await searchParams).page) || 1;
+  // console.log("the search params is : ", );
+  const searchQuery = (await searchParams).search || "";
 
-  if (!payload) {
+  // Fetch articles on the server
+  const { articles, total, totalPages } = await fetchArticles(
+    currentPage,
+    searchQuery,
+  );
+
   return (
-    <div className="min-h-screen flex items-center justify-center ">
-      <div className="max-w-md w-full mx-4">
-        <div className=" rounded-xl shadow-lg p-8 text-center">
-          <div className="flex justify-center mb-6">
-            <div className="w-16 h-16  rounded-full flex items-center justify-center">
-              <Lock className="w-8 h-8 text-blue-600" />
-            </div>
+    <div className="container mx-auto px-4 py-8">
+      {/* Search Form - Client Component */}
+      <SearchForm initialSearch={searchQuery} />
+      {/* Add new Article form */}
+      <CreateArticle id={payload?.id} />
+      {/* Articles List - Server Component */}
+      <Suspense
+        fallback={
+          <div className="max-w-4xl mx-auto text-center py-8">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            <p className="mt-2 text-gray-600">Loading articles...</p>
           </div>
+        }
+      >
+        <ArticlesList articles={articles} />
+      </Suspense>
 
-          <h1 className="text-2xl font-bold text-gray-800 mb-3">
-            Access Required
-          </h1>
-
-          <p className="text-gray-600 mb-8">
-            Please log in to view and explore our articles
-          </p>
-
-          <div className="space-y-4">
-            <Link
-              href="/login"
-              className="block w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200"
-            >
-              Sign In to Continue
-            </Link>
-
-            <div className="text-sm text-gray-500">
-              Don't have an account?{" "}
-              <Link
-                href="/register"
-                className="text-blue-600 hover:text-blue-800 font-medium hover:underline"
-              >
-                Create one here
-              </Link>
-            </div>
+      {/* Pagination - Server Component */}
+      {totalPages > 1 && (
+        <>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            searchQuery={searchQuery}
+          />
+          <div className="max-w-4xl mx-auto text-center mt-4">
+            <p className="text-sm text-gray-600">
+              Page {currentPage} of {totalPages} ({total} total articles)
+            </p>
           </div>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
-  }
-  return (
-    <div className="min-h-screen py-8">
-      <div className="container mx-auto px-4">
-        <CreateArticle id={payload?.id} />
-
-        <h1 className="text-3xl font-bold  m-8 text-center">
-          Search for article
-        </h1>
-        <ListOfArticles />
-      </div>
-    </div>
-  );
-  }
-
-export default ArticlePage;
+}

@@ -4,58 +4,43 @@ import { useForm } from "react-hook-form";
 import CreateArticleSchema, { CreateArticleSchemaType } from "../_Validation/CreateAndEditArticleSchema";
 import { toast } from "react-toastify";
 import { useState } from "react";
-import axios from "axios";
-import { domain_name } from "@/app/utils/Domain";
 import { useRouter } from "next/navigation";
 import { Form } from "@/app/_Components/ui/form";
 import ValidationInput from "@/app/_Components/Inputs/ValidationInput";
-import ValidationTextArea from '@/app/_Components/Inputs/ValidationTextArea';
+import ValidationTextArea from "@/app/_Components/Inputs/ValidationTextArea";
 import { Button } from "@/app/_Components/ui/button";
 import { PlusCircle } from "lucide-react";
+import { useCreateArticle } from "../Hooks/useArticle";
 
-const CreateArticle = ({id}:{id:string|number}) => {
+const CreateArticle = ({ id }: { id: string | number }) => {
   const form = useForm<CreateArticleSchemaType>({
     mode: "onBlur",
     resolver: zodResolver(CreateArticleSchema),
     defaultValues: {
-      title: '',
-      description: '',
-      userId: Number(id) 
-    }
+      title: "",
+      description: "",
+      userId: Number(id),
+    },
   });
-  
+
   const [isAddingArticle, setIsAddingArticle] = useState(false);
   const router = useRouter();
 
+  // Move onSuccess here to ensure proper closure
+  const { mutate: createArticle } = useCreateArticle(() => {
+    toast.success("Article added successfully!");
+    router.refresh();
+    form.reset({
+      title: "",
+      description: "",
+      userId: Number(id),
+    });
+    setIsAddingArticle(false);
+  });
+
   const handleAddArticle = async (data: CreateArticleSchemaType) => {
-    try {
-      setIsAddingArticle(true);
-
-
-      const body: CreateArticleSchemaType = {
-        title: data.title,
-        description: data.description,
-        userId: Number(id),
-      };
-
-      await axios.post(`${domain_name}/api/articles`, body);
-      toast.success("Article added successfully!");
-      router.refresh();
-      form.reset({
-        title: '',
-        description: '',
-        userId: Number(id)
-      });
-      
-    } catch (error: any) {
-      console.error("Error adding article:", error);
-      toast.error(
-        error.response?.data?.message ||
-        "Failed to add article. Please try again."
-      );
-    } finally {
-      setIsAddingArticle(false);
-    }
+    setIsAddingArticle(true);
+    createArticle(data);
   };
 
   return (
@@ -74,16 +59,14 @@ const CreateArticle = ({id}:{id:string|number}) => {
             </p>
           </div>
         </div>
-        
+
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleAddArticle)}
             className="space-y-5 w-full"
           >
             <div className="max-w-4xl mx-auto p-6 rounded-lg shadow-md">
-              <h3 className="text-xl font-bold mb-4">
-                Add New Article
-              </h3>
+              <h3 className="text-xl font-bold mb-4">Add New Article</h3>
 
               <div className="space-y-4">
                 <div>
@@ -126,6 +109,6 @@ const CreateArticle = ({id}:{id:string|number}) => {
       </div>
     </div>
   );
-}
+};
 
 export default CreateArticle;

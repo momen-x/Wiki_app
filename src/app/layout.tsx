@@ -5,6 +5,10 @@ import "./globals.css";
 import "react-toastify/dist/ReactToastify.css";
 import { ThemeProvider } from "./(Modules)/_Theme";
 import Header from "./_Components/Shared/Header";
+import Footer from "./_Components/Shared/Footer";
+import ReactQueryProviders from "./_Providers/ReactQueryProvider";
+
+
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,13 +34,14 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Header />
-          {children}
+          <ReactQueryProviders>
+            <Header />
+            {children}
+            <Footer />
+          </ReactQueryProviders>
         </ThemeProvider>
       </body>
     </html>
   );
 }
 
-//to do when i just finished setting up prisma , the Next command add to package.json
-    // "postinstall": "prisma generate",

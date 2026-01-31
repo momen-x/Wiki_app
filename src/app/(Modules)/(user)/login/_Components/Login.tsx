@@ -13,6 +13,7 @@ import ValidationInput from "@/app/_Components/Inputs/ValidationInput";
 import { Button } from "@/app/_Components/ui/button";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
+import { useLogin } from "../_Hooks/useLogin";
 
 const LoginInput = () => {
   const form = useForm<LoginSchemaType>({
@@ -23,6 +24,11 @@ const LoginInput = () => {
       password: "",
     },
   });
+  const { mutate: LoginUser } = useLogin(() => {
+    toast.success("Login successful");
+    window.location.reload();
+    router.replace("/");
+  });
 
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -31,19 +37,10 @@ const LoginInput = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(
-        `${domain_name}/api/users/login`,
-        {
-          email: form.getValues("email"),
-          password: form.getValues("password"),
-        }
-      );
-
-      if (response.data) {
-        toast.success("Login successful!");
-        router.replace("/");
-        router.refresh();
-      }
+      LoginUser({
+        email: form.getValues("email"),
+        password: form.getValues("password"),
+      });
     } catch (error: any) {
       if (error.response?.status === 401) {
         toast.error("Invalid email or password");
@@ -67,9 +64,7 @@ const LoginInput = () => {
                 <span className=" font-bold text-xl">Login</span>
               </div>
             </div>
-            <CardTitle className="text-2xl font-bold">
-              Welcome Back
-            </CardTitle>
+            <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
             <CardDescription>
               Enter your credentials to access your account
             </CardDescription>
@@ -77,10 +72,7 @@ const LoginInput = () => {
 
           <CardContent>
             <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(submit)}
-                className="space-y-5"
-              >
+              <form onSubmit={form.handleSubmit(submit)} className="space-y-5">
                 <div className="space-y-4">
                   <ValidationInput<LoginSchemaType>
                     fieldTitle="Email Address"
@@ -123,9 +115,6 @@ const LoginInput = () => {
                     "Sign In"
                   )}
                 </Button>
-
-              
-             
               </form>
             </Form>
           </CardContent>
@@ -133,14 +122,14 @@ const LoginInput = () => {
           <CardFooter className="flex flex-col space-y-4">
             <div className="text-center text-sm text-gray-600">
               Don't have an account?{" "}
-              <Link 
-                href="/register" 
+              <Link
+                href="/register"
                 className="font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors"
               >
                 Create account
               </Link>
             </div>
-            
+
             {/* <p className="text-xs text-center text-gray-400">
               By continuing, you agree to our{" "}
               <Link href="/terms" className="hover:underline">Terms</Link>{" "}
