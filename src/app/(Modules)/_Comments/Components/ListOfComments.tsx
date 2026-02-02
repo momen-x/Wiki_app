@@ -1,11 +1,11 @@
 "use client";
 
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { domain_name } from "@/app/utils/Domain";
 import EditCommentDialog from "@/app/(Modules)/_Comments/Components/EditCommentDialog";
 import { PencilIcon, Trash } from "lucide-react";
+import { useDeleteComment } from "../Hooks/useDeleteComment";
+import { toast } from "react-toastify";
 
 interface IComments {
   id: number;
@@ -30,14 +30,17 @@ const ListOfComments = ({ comments, userId }: ListOfCommentsProps) => {
     text: "",
     articleId: 0,
   });
-
+const { mutate: deleteComment } = useDeleteComment(() => {
+  router.refresh();
+  toast.success("Comment deleted successfully");
+});
   const handleDeleteComment = async (id: number) => {
     try {
       const sureConfirm = confirm("Are you sure you want to delete this comment?");
       if (sureConfirm) {
         setLoading(true);
-        await axios.delete(`${domain_name}/api/comments/${id}`);
-        router.refresh();
+deleteComment({ id });
+        
       }
     } catch (error) {
       console.error("Error deleting comment:", error);

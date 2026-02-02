@@ -16,7 +16,7 @@ import DialogEditPasswordAccount from "./DialogEditPasswordAccount";
 
 interface UserData {
   username: string;
-  email: string;
+  // email: string;
 }
 
 const EditAccountInformation = ({ id }: { id: string }) => {
@@ -26,14 +26,12 @@ const EditAccountInformation = ({ id }: { id: string }) => {
     mode: "onBlur",
     resolver: zodResolver(UpdateUserSchema),
     defaultValues: {
-      email: "",
       username: "",
-    }
+    },
   });
 
   const [originalData, setOriginalData] = useState<UserData>({
     username: "",
-    email: "",
   });
   const [isLoading, setIsLoading] = useState(true);
   const [openPasswordDialog, setOpenPasswordDialog] = useState(false);
@@ -48,8 +46,9 @@ const EditAccountInformation = ({ id }: { id: string }) => {
       const response = await axios.put(
         `${domain_name}/api/users/profile/${id}`,
         {
-          username: data.username !== originalData.username ? data.username : undefined,
-          email: data.email !== originalData.email ? data.email : undefined,
+          username:
+            data.username !== originalData.username ? data.username : undefined,
+          // email: data.email !== originalData.email ? data.email : undefined,
         },
       );
 
@@ -82,7 +81,6 @@ const EditAccountInformation = ({ id }: { id: string }) => {
       
       form.reset({
         username: data.username,
-        email: data.email,
       });
       setOriginalData(data);
     } catch (error) {
@@ -111,7 +109,7 @@ const EditAccountInformation = ({ id }: { id: string }) => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
-    <DialogEditPasswordAccount
+      <DialogEditPasswordAccount
         id={id}
         open={openPasswordDialog}
         setOpen={setOpenPasswordDialog}
@@ -122,7 +120,7 @@ const EditAccountInformation = ({ id }: { id: string }) => {
         setOpen={setOpenDeleteAccountDialog}
       />
       <Toaster position="top-right" richColors />
-      
+
       <div className="mb-8 text-center">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
           Profile Settings
@@ -144,7 +142,10 @@ const EditAccountInformation = ({ id }: { id: string }) => {
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleUpdateAccount)} className="space-y-5">
+          <form
+            onSubmit={form.handleSubmit(handleUpdateAccount)}
+            className="space-y-5"
+          >
             <div className="space-y-4">
               <ValidationInput<UpdateUserSchemaType>
                 fieldTitle="Username"
@@ -152,25 +153,26 @@ const EditAccountInformation = ({ id }: { id: string }) => {
                 placeholder="Enter your username"
                 type="text"
               />
-              
-              <ValidationInput<UpdateUserSchemaType>
+
+              {/* <ValidationInput<UpdateUserSchemaType>
                 fieldTitle="Email Address"
                 nameInSchema="email"
                 placeholder="Enter your email"
                 type="email"
-              />
+              /> */}
             </div>
 
-        
-              <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
-                <Button
-                  type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium"
-                >
-                  Save Profile Changes
-                </Button>
-              </div>
-            
+            <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
+              <Button
+                type="submit"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium cursor-pointer"
+                disabled={
+                  isLoading || form.watch("username") === originalData.username
+                }
+              >
+               {isLoading?" Updating...":" Save Profile Changes"}
+              </Button>
+            </div>
           </form>
         </Form>
       </div>
@@ -191,7 +193,9 @@ const EditAccountInformation = ({ id }: { id: string }) => {
             <div className="flex items-center gap-3">
               <LockIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               <div>
-                <h3 className="font-medium text-gray-800 dark:text-white">Password</h3>
+                <h3 className="font-medium text-gray-800 dark:text-white">
+                  Password
+                </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   Change your account password
                 </p>
@@ -210,7 +214,9 @@ const EditAccountInformation = ({ id }: { id: string }) => {
             <div className="flex items-center gap-3">
               <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
               <div>
-                <h3 className="font-medium text-gray-800 dark:text-white">Delete Account</h3>
+                <h3 className="font-medium text-gray-800 dark:text-white">
+                  Delete Account
+                </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   Permanently delete your account and all data
                 </p>

@@ -17,21 +17,22 @@ export async function GET(request: NextRequest, { params }: IProps) {
     if (isNaN(id)) {
       return NextResponse.json({ message: "Invalid user ID" }, { status: 400 });
     }
-
-    const jwtToken = request.cookies.get("token")?.value;
-
-    if (!jwtToken) {
-      return NextResponse.json(
-        { message: "Unauthorized: No token provided" },
-        { status: 401 }
-      );
-    }
-
     const user = await prisma.user.findUnique({
       where: { id },
       select: {
         id: true,
         username: true,
+        email: true,
+        articles: {
+          select: {
+            title: true,
+            description: true,
+            id: true,
+            createdAt: true,
+            updatedAt: true,
+            comments: true,
+          },
+        },
       },
     });
 

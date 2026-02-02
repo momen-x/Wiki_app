@@ -9,8 +9,7 @@ import { UpdateCommentSchema, UpdateCommentSchemaType } from "@/app/(Modules)/_C
 import { zodResolver } from "@hookform/resolvers/zod";
 import ValidationInput from "@/app/_Components/Inputs/ValidationInput";
 import { Button } from "@/app/_Components/ui/button";
-import axios from "axios";
-import { domain_name } from "@/app/utils/Domain";
+import { useEditComment } from "../Hooks/useEditComment";
 
 interface IProps {
   open: boolean;
@@ -30,6 +29,11 @@ const EditCommentDialog = ({ open, setOpen, id, text }: IProps) => {
       text: text,
     },
   });
+  const { mutate: editComment } = useEditComment(() => {
+    toast.success("Comment updated successfully");
+    router.refresh();
+    handleClose();
+  });
 
   useEffect(() => {
     if (open) {
@@ -47,15 +51,13 @@ const EditCommentDialog = ({ open, setOpen, id, text }: IProps) => {
   const handleEditComment = async (data: UpdateCommentSchemaType) => {
     setLoading(true);
     try {
-      if(id!==0){
-        await axios.put(`${domain_name}/api/comments/${id}`, { text:data.text});
-        toast.success("Comment updated successfully");
-        router.refresh();
-        handleClose();
+      if (id !== 0) {
+        //EditComment
+        editComment({ id, data });
       }
     } catch (error: any) {
       toast.error(
-        error?.response?.data?.message || "Network error. Please try again."
+        error?.response?.data?.message || "Network error. Please try again.",
       );
     } finally {
       setLoading(false);
@@ -76,7 +78,7 @@ const EditCommentDialog = ({ open, setOpen, id, text }: IProps) => {
 
         <div className="py-4">
           <Form {...form}>
-            <form 
+            <form
               onSubmit={form.handleSubmit(handleEditComment)}
               className="space-y-4"
             >
@@ -87,7 +89,7 @@ const EditCommentDialog = ({ open, setOpen, id, text }: IProps) => {
                 type="text"
                 className="min-w-42"
               />
-              
+
               <DialogFooter className="gap-2 pt-4">
                 <Button
                   type="button"

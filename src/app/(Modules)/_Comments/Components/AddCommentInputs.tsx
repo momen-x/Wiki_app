@@ -10,6 +10,8 @@ import { Form } from "@/app/_Components/ui/form";
 import ValidationInput from '../../../_Components/Inputs/ValidationInput';
 import { Button } from "@/app/_Components/ui/button";
 import { Send } from "lucide-react";
+import { useAddComment } from "../Hooks/useAddComment";
+import { toast } from "react-toastify";
 
 interface IId {
   id: string;
@@ -28,6 +30,12 @@ const AddCommentInputs = ({ id }: IId) => {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const { mutate: addComment } = useAddComment(() => {
+    router.refresh();
+    form.reset();
+    toast.success("Comment added successfully");
+   setIsLoading(false);
+  });
   
   const handleAddComment = async () => {
     setIsLoading(true);
@@ -41,14 +49,11 @@ const AddCommentInputs = ({ id }: IId) => {
         articleId: +id,
       };
 
-      await axios.post(`${domain_name}/api/comments`, body);
-      router.refresh();
-      form.reset(); 
+     addComment(body);
+
     } catch (error) {
-      // Handle error if needed
-    } finally {
-      setIsLoading(false);
-    }
+   console.error(error);
+    } 
   };
 
   return (

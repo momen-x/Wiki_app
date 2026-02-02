@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";     
 import { NextRequest, NextResponse } from "next/server";
 
-interface Iprops {
+interface IProps {
   params: Promise<{ id: string }>;
 }
 import jwt, { JwtPayload } from "jsonwebtoken";
@@ -13,7 +13,7 @@ import { UpdateArticleSchema } from "@/app/(Modules)/article/_Validation/CreateA
  * @desc Display single article
  * @access public
  */
-export async function GET(request: NextRequest, { params }: Iprops) {
+export async function GET(request: NextRequest, { params }: IProps) {
   try {
     const id = +(await params).id;
     if (isNaN(id)) {
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest, { params }: Iprops) {
  * @desc Edit  article by user themselves
  * @access private
  */
-export async function PUT(request: NextRequest, { params }: Iprops) {
+export async function PUT(request: NextRequest, { params }: IProps) {
   try {
     const id = +(await params).id;
     if (isNaN(id)) {
@@ -101,7 +101,7 @@ export async function PUT(request: NextRequest, { params }: Iprops) {
  * @desc Delete article by user themselves or by admin
  * @access private
  */
-export async function DELETE(request: NextRequest, { params }: Iprops) {
+export async function DELETE(request: NextRequest, { params }: IProps) {
   try {
     const id = +(await params).id;
     if (isNaN(id)) {

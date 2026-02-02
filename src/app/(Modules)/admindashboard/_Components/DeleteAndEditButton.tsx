@@ -62,32 +62,39 @@ const DeleteAndEditButton = ({
   return (
     <React.Fragment>
       <EditArticleDialog
-        props={{
-          id: articleId||0,
-          open: openEditArticleDialog,
-          setOpen: setOpenEditArticleDialog,
-          title: title ||"",
-          description: description||"",
-          userId: userId,
-        }}
+        id={articleId || 0}
+        open={openEditArticleDialog}
+        setOpen={setOpenEditArticleDialog}
+        title={title || ""}
+        description={description || ""}
+        userId={userId}
       />
       <EditCommentDialog
-       
-    open={openEditCommentDialog} setOpen={setOpenEditCommentDialog}  id={commentId||0} text={commentText||""}
+        open={openEditCommentDialog}
+        setOpen={setOpenEditCommentDialog}
+        id={commentId || 0}
+        text={commentText || ""}
       />
-    
+
       {id === userId ? (
         <Button
           variant="default"
           color="primary"
           onClick={handleEditComment}
+          className="cursor-pointer"
         >
           Edit
         </Button>
       ) : (
         ""
       )}
-      <Button variant="destructive" color="error" onClick={handleDelete} style={{ marginLeft:"8px" }}>
+      <Button
+        variant="destructive"
+        color="error"
+        onClick={handleDelete}
+        style={{ marginLeft: "8px" }}
+        className="cursor-pointer"
+      >
         Delete
       </Button>
     </React.Fragment>

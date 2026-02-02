@@ -10,7 +10,7 @@ import ValidationInput from "@/app/_Components/Inputs/ValidationInput";
 import ValidationTextArea from "@/app/_Components/Inputs/ValidationTextArea";
 import { Button } from "@/app/_Components/ui/button";
 import { PlusCircle } from "lucide-react";
-import { useCreateArticle } from "../Hooks/useArticle";
+import { useCreateArticle } from "../Hooks/useCreteArticle";
 
 const CreateArticle = ({ id }: { id: string | number }) => {
   const form = useForm<CreateArticleSchemaType>({

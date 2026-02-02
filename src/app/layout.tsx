@@ -7,6 +7,7 @@ import { ThemeProvider } from "./(Modules)/_Theme";
 import Header from "./_Components/Shared/Header";
 import Footer from "./_Components/Shared/Footer";
 import ReactQueryProviders from "./_Providers/ReactQueryProvider";
+import ToasterProvider from "./_Providers/ToastProvider";
 
 
 
@@ -35,6 +36,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ReactQueryProviders>
+            <ToasterProvider/>
             <Header />
             {children}
             <Footer />

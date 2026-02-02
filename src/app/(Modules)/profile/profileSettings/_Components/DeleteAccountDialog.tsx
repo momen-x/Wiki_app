@@ -12,7 +12,7 @@ import { Button } from "@/app/_Components/ui/button";
 import { domain_name } from "@/app/utils/Domain";
 import { useState } from "react";
 import { AlertTriangle } from "lucide-react";
-
+// to do using tanStack library to handle edit the user info (password , (email or password)) , and deleting his account
 interface IDeleteAccountDialogProps {
   id: string;
   open: boolean;
@@ -43,14 +43,14 @@ const DeleteAccountDialog = ({
   const handleDeleteAccount = async (data: DeleteAccountType) => {
     setIsLoading(true);
     try {
-      await axios.delete(
-        `${domain_name}/api/users/profile/${id}`,
-        {
-          headers: {
-            "X-Password": data.password,
-          },
-        },
-      );
+      // await axios.delete(
+      //   `${domain_name}/api/users/profile/${id}`,
+      //   {
+      //     headers: {
+      //       "X-Password": data.password,
+      //     },
+      //   },
+      // );
 
       toast.success("Account deleted successfully");
       handleClose();
@@ -124,3 +124,4 @@ const DeleteAccountDialog = ({
 };
 
 export default DeleteAccountDialog;
+

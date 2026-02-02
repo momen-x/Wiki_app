@@ -70,10 +70,11 @@ const DialogEditPasswordAccount = ({ id, open, setOpen }: PasswordDialogProps) =
     if (!validateForm()) return;
 
     try {
-      await axios.put(`${domain_name}/api/users/profile/${id}`, {
-        oldPassword: data.oldPassword,
-        password: data.newPassword,
-      });
+      // await axios.put(`${domain_name}/api/users/profile/${id}`, {
+      //   oldPassword: data.oldPassword,
+      //   password: data.newPassword,
+      // });
+      
 
       toast.success("Password updated successfully");
       handleClose();

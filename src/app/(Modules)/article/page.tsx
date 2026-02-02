@@ -7,6 +7,7 @@ import Pagination from "./_Components/Pagination";
 import { cookies } from "next/headers";
 import { verifyTokenForPage } from "@/app/utils/verifyToken";
 import CreateArticle from "./_Components/CreateArticle";
+import NotAuthUser from "./_Components/NotAuthUser";
 
 interface IArticleData {
   userId: number;
@@ -61,7 +62,6 @@ export default async function ArticlesPage({
   const token = (await cookieStore)?.get("token");
   const payload = verifyTokenForPage(token?.value || "");
   const currentPage = Number((await searchParams).page) || 1;
-  // console.log("the search params is : ", );
   const searchQuery = (await searchParams).search || "";
 
   // Fetch articles on the server
@@ -72,10 +72,16 @@ export default async function ArticlesPage({
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Search Form - Client Component */}
-      <SearchForm initialSearch={searchQuery} />
-      {/* Add new Article form */}
-      <CreateArticle id={payload?.id} />
+      {payload?.id ? (
+        <>
+          {/* Search Form - Client Component */}
+          <SearchForm initialSearch={searchQuery} />
+          {/* Add new Article form */}
+          <CreateArticle id={payload?.id} />
+        </>
+      ) : (
+        <NotAuthUser message="Please log in to add a new article." />
+      )}
       {/* Articles List - Server Component */}
       <Suspense
         fallback={

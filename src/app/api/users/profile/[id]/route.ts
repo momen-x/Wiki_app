@@ -99,7 +99,7 @@ export async function DELETE(request: NextRequest, { params }: IProps) {
 /**
  * @method GET
  * @route ~/api/users/profile/:id
- * @description Get profile by id , just loged user can see your acount
+ * @description Get profile by id , every user can show the articles on the another users
  * @access public
  */
 export async function GET(request: NextRequest, { params }: IProps) {
@@ -224,20 +224,20 @@ export async function PUT(request: NextRequest, { params }: IProps) {
     }
 
     // Validate email uniqueness
-    if (body.email && body.email?.trim() !== "") {
-      const existingUser = await prisma.user.findFirst({
-        where: {
-          email: body.email,
-          NOT: { id },
-        },
-      });
-      if (existingUser) {
-        return NextResponse.json(
-          { message: "This email is already taken" },
-          { status: 400 }
-        );
-      }
-    }
+    // if (body.email && body.email?.trim() !== "") {
+    //   const existingUser = await prisma.user.findFirst({
+    //     where: {
+    //       email: body.email,
+    //       NOT: { id },
+    //     },
+    //   });
+    //   if (existingUser) {
+    //     return NextResponse.json(
+    //       { message: "This email is already taken" },
+    //       { status: 400 }
+    //     );
+    //   }
+    // }
 
     const updatedUser = await prisma.user.update({
       where: { id },

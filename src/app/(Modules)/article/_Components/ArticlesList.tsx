@@ -27,9 +27,9 @@ export default function ArticlesList({ articles }: ArticlesListProps) {
 
   return (
     <div className="space-y-6">
-      {articles.map((article) => (
+      {articles.map((article,index) => (
         <div
-          key={article.id}
+          key={index}
           className="max-w-4xl mx-auto mb-6 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow dark:bg-gray-700"
         >
           <h3 className="text-xl font-bold mb-2">{article.title}</h3>
