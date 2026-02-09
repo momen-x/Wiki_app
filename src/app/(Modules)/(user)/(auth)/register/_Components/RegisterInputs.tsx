@@ -41,7 +41,7 @@ const RegisterInput = () => {
   const { mutate: registerUser } = useRegister(
     () => {
       toast.success("Check from your email to continues");
-      router.replace("/login");
+      router.replace("/login?registered=true");
       // window.location.reload();
       setLoading(false);
     },
