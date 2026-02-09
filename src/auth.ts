@@ -1,25 +1,55 @@
 import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { PrismaClient } from "@prisma/client";
-import authConfig from "./auth.config";
+import Google from "next-auth/providers/google";
+import Credentials from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
+import LoginSchema from "./app/(Modules)/(user)/login/_Validations/LoginValidation";
+import { authConfig } from "./auth.config";
 
 const prisma = new PrismaClient();
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
+  ...authConfig,
   adapter: PrismaAdapter(prisma) as any,
   session: { strategy: "jwt" },
-  ...authConfig,
-  callbacks: {
-    async signIn({ user, account, profile }) {
-      // Allow OAuth sign-ins
-      if (account?.provider === "google") {
-        return true;
-      }
-      // Allow credentials sign-ins
-      return true;
-    },
+  providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+    Credentials({
+      async authorize(credentials) {
+        const validation = LoginSchema.safeParse(credentials);
+        
+        if (!validation.success) {
+          return null;
+        }
 
-    async jwt({ token, user, account }) {
+        const { email, password } = validation.data;
+        const user = await prisma.user.findUnique({ where: { email } });
+
+        if (!user || !user.password) {
+          return null;
+        }
+
+        const isPasswordMatch = await bcrypt.compare(password, user.password);
+        if (!isPasswordMatch) {
+          return null;
+        }
+
+        return {
+          id: user.id.toString(),
+          email: user.email,
+          name: user.name,
+          username: user.username,
+          isAdmin: user.isAdmin,
+        };
+      },
+    }),
+  ],
+  callbacks: {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.name = user.name;
@@ -35,16 +65,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         session.user.name = token.name as string;
         session.user.username = token.username as string;
         session.user.isAdmin = (token.isAdmin as boolean) ?? false;
-        session.user.token=token;
       }
       return session;
-    },
-
-    async redirect({ url, baseUrl }) {
-      // Redirect to home after successful login
-      if (url.startsWith("/")) return `${baseUrl}${url}`;
-      if (new URL(url).origin === baseUrl) return url;
-      return baseUrl;
     },
   },
 });
