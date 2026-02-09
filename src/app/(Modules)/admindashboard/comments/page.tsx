@@ -1,8 +1,6 @@
 import DeleteAndEditButton from "@/app/(Modules)/admindashboard/_Components/DeleteAndEditButton";
 import { domain_name } from "@/app/utils/Domain";
-import { verifyTokenForPage } from "@/app/utils/verifyToken";
 import auth from "@/auth";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 interface IComments {

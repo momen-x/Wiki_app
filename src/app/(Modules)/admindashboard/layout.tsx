@@ -23,7 +23,7 @@ const pages = [
   { icon: MessageSquareTextIcon , label: "Comments", path: "/admindashboard/comments" },
 
 ];
-const Dashboard = (  { children }: DashboardLayoutProps) => {
+const Dashboard =(  { children }: DashboardLayoutProps) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const toggleSidebar = () => {
