@@ -6,10 +6,8 @@ import { createPortal } from "react-dom";
 import { X, Menu } from "lucide-react";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
-import axios from "axios";
-import { domain_name } from "@/app/utils/Domain";
 import { toast } from "react-toastify";
-
+import { signOut } from "next-auth/react";
 interface IURL {
   name: string;
   path: string;
@@ -158,16 +156,18 @@ export const LogOutButton = () => {
   const router = useRouter();
 
   const onLogout = async () => {
-  try {
-      await axios.get(`${domain_name}/api/users/logout`);
-
+    try {
+      await signOut({
+        redirect: false,
+        callbackUrl: "/login",
+      });
       router.push("/login");
       router.refresh();
     } catch (error) {
+      console.error("Logout error:", error);
       toast.error("Can't log out now. Please check your internet connection.");
     }
-  }
-
+  };
   
   return < Button
     onClick={onLogout}

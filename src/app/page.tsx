@@ -3,10 +3,13 @@ import wiki from "@/app/images/wiki_withoutBg.png";
 import { BookOpen, Users, Edit, Shield, Search, Globe } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/app/_Components/ui/button";
+import auth from "@/auth";
 
 export const dynamic = 'force-dynamic';
 
-export default function Home() {
+export default async function Home() {
+  const session=await auth();
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}

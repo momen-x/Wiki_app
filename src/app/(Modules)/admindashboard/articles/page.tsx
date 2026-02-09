@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Article_In_All_Page } from "@/app/utils/CountOfArticleInPage";
+import auth from "@/auth";
 
 interface IArticle {
   id: number;
@@ -33,11 +34,10 @@ interface ArticleAdminPageProps {
 }
 
 const ArticleAdminPage = async ({ searchParams }: ArticleAdminPageProps) => {
-  const cookieStore = cookies();
-  const token = (await cookieStore)?.get("token");
-  const payload = verifyTokenForPage(token?.value || "");
+  //verification
+const session =await auth();
 
-  if (!payload?.isAdmin) {
+  if (!session || !session.user.isAdmin) {
     redirect("/");
   }
 
@@ -48,9 +48,6 @@ const ArticleAdminPage = async ({ searchParams }: ArticleAdminPageProps) => {
     `${domain_name}/api/articles?page=${currentPage}&limit=${Article_In_All_Page}`,
     {
       cache: "no-store",
-      headers: {
-        Cookie: `token=${token?.value}`,
-      },
     },
   );
 
@@ -242,7 +239,7 @@ const ArticleAdminPage = async ({ searchParams }: ArticleAdminPageProps) => {
                       </td>
                       <td className="px-6 py-4">
                         <DeleteAndEditButton
-                          id={payload?.id}
+                          id={+session.user?.id}
                           userId={article.userId}
                           articleId={article.id}
                           title={article.title}

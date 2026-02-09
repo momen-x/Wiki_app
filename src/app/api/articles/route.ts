@@ -1,9 +1,9 @@
 // app/api/article/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";     // ✅ or wherever your prisma.ts lives
-import { verifyToken } from "@/app/utils/verifyToken";
 import { Article_In_All_Page } from "../../utils/CountOfArticleInPage";
 import CreateArticleSchema from "@/app/(Modules)/article/_Validation/CreateAndEditArticleSchema";
+import auth from "@/auth";
 
 interface IArticleDto {
   title: string;
@@ -61,28 +61,27 @@ export async function GET(request: Request) {
 /**
  * @method POST
  * @route ~/api/articles
- * @description Create new article By logged useer
+ * @description Create new article By logged user
  * @access public
  */
 export async function POST(request: NextRequest) {
   try {
-    const token = request.cookies.get("token")?.value;
+    // const token = request.cookies.get("token")?.value;
 
-    if (!token) {
-      return NextResponse.json(
-        { message: "Access denied. No token provided." },
-        { status: 401 }
-      );
-    }
+    // if (!token) {
+    //   return NextResponse.json(
+    //     { message: "Access denied. No token provided." },
+    //     { status: 401 }
+    //   );
+    // }
+const session = await auth();
 
-    const decoded = verifyToken(request);
-
-    if (!decoded?.id) {
+    if (!session) {
       return NextResponse.json({ message: "Invalid token." }, { status: 401 });
     }
 
     const body = (await request.json()) as IArticleDto;
-    if (decoded.id !== body.userId) {
+    if (Number(session.user.id) !== body.userId) {
       return NextResponse.json({ message: "Invalid token." }, { status: 401 });
     }
     const validation = CreateArticleSchema.safeParse(body);
@@ -97,7 +96,7 @@ export async function POST(request: NextRequest) {
       data: {
         title: body.title,
         description: body.description,
-        userId: decoded.id,
+        userId: +session.user.id,
       },
       include: {
         user: {

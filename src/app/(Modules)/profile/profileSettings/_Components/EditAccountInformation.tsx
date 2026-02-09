@@ -16,7 +16,7 @@ import DialogEditPasswordAccount from "./DialogEditPasswordAccount";
 
 interface UserData {
   username: string;
-  // email: string;
+
 }
 
 const EditAccountInformation = ({ id }: { id: string }) => {
@@ -48,23 +48,11 @@ const EditAccountInformation = ({ id }: { id: string }) => {
         {
           username:
             data.username !== originalData.username ? data.username : undefined,
-          // email: data.email !== originalData.email ? data.email : undefined,
         },
+        { withCredentials: true },
       );
-
-      if (data.username !== originalData.username) {
-        const newToken = response.data.token || response.data.message?.token;
-        if (newToken) {
-          document.cookie = `token=${newToken}; path=/; max-age=86400`;
-        }
-        toast.success("Profile updated successfully. Reloading...");
-        setTimeout(() => {
-          router.refresh();
-        }, 1000);
-      } else {
-        toast.success("Profile updated successfully");
-        fetchUserData();
-      }
+      toast.success("the username updated successfully");
+  
     } catch (error: any) {
       const message = error.response?.data?.message || "Failed to update profile";
       toast.error(message);
@@ -73,10 +61,15 @@ const EditAccountInformation = ({ id }: { id: string }) => {
 
   const fetchUserData = async () => {
     try {
-      const response = await axios.get(`${domain_name}/api/users/profile/${id}`);
+      const response = await axios.get(
+        `${domain_name}/api/users/profile/${id}`,
+        {
+          withCredentials: true,
+        },
+      );
       const data = {
         username: response.data.message.username,
-        email: response.data.message.email,
+        name: response.data.message.name,
       };
       
       form.reset({
@@ -147,19 +140,14 @@ const EditAccountInformation = ({ id }: { id: string }) => {
             className="space-y-5"
           >
             <div className="space-y-4">
-              <ValidationInput<UpdateUserSchemaType>
-                fieldTitle="Username"
-                nameInSchema="username"
-                placeholder="Enter your username"
-                type="text"
-              />
-
-              {/* <ValidationInput<UpdateUserSchemaType>
-                fieldTitle="Email Address"
-                nameInSchema="email"
-                placeholder="Enter your email"
-                type="email"
-              /> */}
+              {originalData.username && (
+                <ValidationInput<UpdateUserSchemaType>
+                  fieldTitle="Username"
+                  nameInSchema="username"
+                  placeholder="Enter your username"
+                  type="text"
+                />
+              )}
             </div>
 
             <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
@@ -170,7 +158,7 @@ const EditAccountInformation = ({ id }: { id: string }) => {
                   isLoading || form.watch("username") === originalData.username
                 }
               >
-               {isLoading?" Updating...":" Save Profile Changes"}
+                {isLoading ? " Updating..." : " Save Profile Changes"}
               </Button>
             </div>
           </form>

@@ -2,12 +2,11 @@ import React from 'react'
 import Link from "next/link";
 import Image from "next/image";
 import wikiLogo from "@/app/images/wikiLogo.png";
-import { verifyTokenForPage } from "@/app/utils/verifyToken";
 import { MobileMenu } from "@/app/_Components/Shared/MobileMenu";
 import { AuthButtons } from "@/app/_Components/Shared/AuthButtons";
-import { cookies } from "next/headers";
-import { ModeToggleBtn } from '../../(Modules)/_Theme/components/ToggeleModBtn';
-import { HomeIcon, Info, LayoutDashboard, Newspaper } from 'lucide-react';
+import { ModeToggleBtn } from "../../(Modules)/_Theme/components/ToggeleModBtn";
+import { HomeIcon, Info, LayoutDashboard, Newspaper } from "lucide-react";
+import auth from "@/auth";
 
 interface IURL {
   name: string;
@@ -23,11 +22,11 @@ const basePages: IURL[] = [
 
 const Header = async () => {
   const pages = [...basePages];
-  const cookieStore = cookies();
-  const token = (await cookieStore)?.get("token");
-  const payload = verifyTokenForPage(token?.value || "");
+  // verification
+  const session = await auth();
+  const isAdmin = false;
 
-  if (payload?.isAdmin) {
+  if (isAdmin) {
     if (!pages.some((p) => p.name === "Admin Dashboard")) {
       pages.push({
         name: "Admin Dashboard",
@@ -92,12 +91,15 @@ const Header = async () => {
             </div>
 
             {/* Auth Buttons */}
-            <AuthButtons payload={payload} username={payload?.username} />
+            <AuthButtons
+              payload={session}
+              username={session?.user?.name || session?.user.username || ""}
+            />
 
             {/* Mobile Menu */}
             <div className="md:hidden flex items-center space-x-3">
               <ModeToggleBtn />
-              <MobileMenu pages={pages} payload={payload} />
+              <MobileMenu pages={pages} payload={session} />
             </div>
           </div>
         </nav>

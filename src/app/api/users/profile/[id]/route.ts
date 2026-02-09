@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";     
-import jwt, { JwtPayload } from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import auth from "@/auth";
+
+//it's so important to fix this code 
 
 
 
-
-const TOKEN_COOKIE_NAME = "token";
 
 interface IProps {
   params: Promise<{ id: string }>;
@@ -19,37 +19,33 @@ interface IProps {
  */
 export async function DELETE(request: NextRequest, { params }: IProps) {
   try {
+    const session = await auth();
     const id = +(await params).id;
     if (isNaN(id)) {
       return NextResponse.json({ message: "Invalid user ID" }, { status: 400 });
+    }
+    if (!session) {
+      return NextResponse.json({ message: "unauthorized" }, { status: 400 });
     }
 
     const user = await prisma.user.findUnique({
       where: { id },
       include: { comments: true, articles: true },
     });
-    
+
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    const jwtToken = request.cookies.get("token");
-    if (!jwtToken) {
-      return NextResponse.json(
-        { message: "Unauthorized: No token provided" },
-        { status: 401 }
-      );
-    }
+    // const userFromToken = jwt.verify(
+    //   jwtToken.value,
+    //   process.env.JWT_SECRET as string
+    // ) as JwtPayload;
 
-    const userFromToken = jwt.verify(
-      jwtToken.value,
-      process.env.JWT_SECRET as string
-    ) as JwtPayload;
-
-    if (userFromToken.id !== id && userFromToken.isAdmin===false) {
+    if (Number(session?.user.id) !== id && session.user.isAdmin === false) {
       return NextResponse.json(
         { message: "Unauthorized: You can only delete your own account" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -57,41 +53,32 @@ export async function DELETE(request: NextRequest, { params }: IProps) {
     if (!password) {
       return NextResponse.json(
         { message: "Password is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(password, user.password || "");
     if (!isPasswordValid) {
       return NextResponse.json(
         { message: "The password is not correct" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     await prisma.user.delete({ where: { id } });
-    
+
     const response = NextResponse.json(
       { message: "Account deleted successfully" },
-      { status: 200 }
+      { status: 200 },
     );
 
     response.cookies.delete("token");
     return response;
-
   } catch (error) {
-    if (error instanceof jwt.JsonWebTokenError) {
-      return NextResponse.json({ message: "Invalid token" }, { status: 401 });
-    }
-
-    if (error instanceof jwt.TokenExpiredError) {
-      return NextResponse.json({ message: "Token expired" }, { status: 401 });
-    }
-
     console.error("Delete account error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -117,6 +104,7 @@ export async function GET(request: NextRequest, { params }: IProps) {
         // comments: true,
         id: true,
         username: true,
+        name:true,
         email: true,
         createdAt: true,
         articles: {
@@ -135,17 +123,11 @@ export async function GET(request: NextRequest, { params }: IProps) {
     if (!user) {
       NextResponse.json({ message: "the user is not found" }, { status: 404 });
     }
-    const jwtToken = request.cookies.get("token");
-    const token = jwtToken?.value as string;
 
-    if (token !== undefined) {
+
+
       return NextResponse.json({ message: user }, { status: 200 });
-    } else {
-      return NextResponse.json(
-        { message: "Unauthorized: You can't see this acount" },
-        { status: 403 }
-      );
-    }
+    
   } catch (error) {
     return NextResponse.json(
       { message: "Internal server error" },
@@ -173,17 +155,20 @@ export async function PUT(request: NextRequest, { params }: IProps) {
     }
 
     // Verify the user is authorized to make changes
-    const jwtToken = request.cookies.get("token");
-    const token = jwtToken?.value as string;
-    const userFromToken = jwt.verify(
-      token,
-      process.env.JWT_SECRET as string
-    ) as JwtPayload;
-
-    if (userFromToken.id !== id) {
+    // const jwtToken = request.cookies.get("token");
+    // const token = jwtToken?.value as string;
+    // const userFromToken = jwt.verify(
+    //   token,
+    //   process.env.JWT_SECRET as string
+    // ) as JwtPayload;
+    const session = await auth();
+    if (!session) {
+      return NextResponse.json({ message: "unauthorized" }, { status: 400 });
+    }
+    if (Number(session?.user.id) !== id) {
       return NextResponse.json(
         { message: "Unauthorized: You can only edit your own account" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -193,12 +178,12 @@ export async function PUT(request: NextRequest, { params }: IProps) {
     if (body.oldPassword && body.password) {
       const isPasswordValid = await bcrypt.compare(
         body.oldPassword,
-        user.password
+        user.password || "",
       );
       if (!isPasswordValid) {
         return NextResponse.json(
           { message: "Current password is incorrect" },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -218,26 +203,10 @@ export async function PUT(request: NextRequest, { params }: IProps) {
       if (existingUser) {
         return NextResponse.json(
           { message: "This username is already taken" },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
-
-    // Validate email uniqueness
-    // if (body.email && body.email?.trim() !== "") {
-    //   const existingUser = await prisma.user.findFirst({
-    //     where: {
-    //       email: body.email,
-    //       NOT: { id },
-    //     },
-    //   });
-    //   if (existingUser) {
-    //     return NextResponse.json(
-    //       { message: "This email is already taken" },
-    //       { status: 400 }
-    //     );
-    //   }
-    // }
 
     const updatedUser = await prisma.user.update({
       where: { id },
@@ -253,16 +222,16 @@ export async function PUT(request: NextRequest, { params }: IProps) {
     });
 
     // Generate new token with updated user data
-    const newToken = jwt.sign(
-      {
-        id: updatedUser.id,
-        username: updatedUser.username,
-        email: updatedUser.email,
-        isAdmin: updatedUser.isAdmin,
-      },
-      process.env.JWT_SECRET as string,
-      { expiresIn: "30d" }
-    );
+    // const newToken = jwt.sign(
+    //   {
+    //     id: updatedUser.id,
+    //     username: updatedUser.username,
+    //     email: updatedUser.email,
+    //     isAdmin: updatedUser.isAdmin,
+    //   },
+    //   process.env.JWT_SECRET as string,
+    //   { expiresIn: "30d" },
+    // );
 
     // Prepare the response
     const response = NextResponse.json(
@@ -270,19 +239,19 @@ export async function PUT(request: NextRequest, { params }: IProps) {
         message: "User updated successfully",
         user: updatedUser,
       },
-      { status: 200 }
+      { status: 200 },
     );
 
     // Set the new token in cookies
-    response.cookies.set({
-      name: TOKEN_COOKIE_NAME,
-      value: newToken,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 60 * 60 * 24 * 30, // 30 days
-      path: "/",
-    });
+    // response.cookies.set({
+    //   name: TOKEN_COOKIE_NAME,
+    //   value: newToken,
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === "production",
+    //   sameSite: "strict",
+    //   maxAge: 60 * 60 * 24 * 30, // 30 days
+    //   path: "/",
+    // });
 
     return response;
   } catch (error) {

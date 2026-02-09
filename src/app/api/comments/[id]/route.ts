@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyToken } from "@/app/utils/verifyToken";
 import { prisma } from "@/lib/prisma";    
 import { z } from 'zod';
 import { UpdateCommentSchema, UpdateCommentSchemaType } from "@/app/(Modules)/_Comments/Validation/CreateAndEditComment";
+import auth from "@/auth";
 interface IProps {
   params: Promise<{ id: string }>;
 }
@@ -41,8 +41,8 @@ export async function PUT(request: NextRequest, { params }: IProps) {
         { status: 403 }
       );
     }
-    const user = verifyToken(request);
-    if (user === null || user.id !== Comment.userId) {
+   const session=await auth();
+    if (!session || Number(session.user.id) !== Comment.userId) {
       return NextResponse.json(
         { message: "u are not allowed to edit this comment , access denied" },
         { status: 403 }
@@ -87,15 +87,15 @@ export async function DELETE(request: NextRequest, { params }: IProps) {
       );
     }
 
-    const user = verifyToken(request);
-    if (!user) {
+   const session=await auth();
+    if (!session) {
       return NextResponse.json(
         { message: "Invalid token. Access denied." },
         { status: 401 }
       );
     }
 
-    if (user.id !== Comment.userId && !user.isAdmin) {
+    if (Number(session.user.id) !== Comment.userId && !session.user.isAdmin) {
       return NextResponse.json(
         {
           message: "You are not allowed to delete this comment. Access denied.",

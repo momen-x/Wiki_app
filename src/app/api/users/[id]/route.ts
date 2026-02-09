@@ -22,6 +22,7 @@ export async function GET(request: NextRequest, { params }: IProps) {
       select: {
         id: true,
         username: true,
+        name:true,
         email: true,
         articles: {
           select: {

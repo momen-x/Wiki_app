@@ -18,6 +18,7 @@ updatedAt: string;
 export interface IUserProfile {
 id: number;
 username: string;
+name:string;
 email: string;
 articles: IUserArticle[];
 createdAt: string;

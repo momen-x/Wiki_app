@@ -11,6 +11,10 @@ const UserProfile = async ({ id }: IParams) => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <h2 className="text-2xl sm:text-xl  mb-4 w-[60vw] m-auto ">
+
+     the articles are : {"("}{userData.message.articles.length}{")"} Articles 
+      </h2>
       {userData.message.articles && (
         <ArticlesList articles={userData.message.articles} />
       )}

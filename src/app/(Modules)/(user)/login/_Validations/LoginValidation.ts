@@ -1,5 +1,4 @@
 import z from "zod";
-import { de } from "zod/v4/locales";
 
 const LoginSchema   = z.object({
     email: z.string().min(1, "Email is required").email("Invalid email address"),

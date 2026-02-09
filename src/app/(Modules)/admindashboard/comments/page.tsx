@@ -1,6 +1,7 @@
 import DeleteAndEditButton from "@/app/(Modules)/admindashboard/_Components/DeleteAndEditButton";
 import { domain_name } from "@/app/utils/Domain";
 import { verifyTokenForPage } from "@/app/utils/verifyToken";
+import auth from "@/auth";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -15,19 +16,16 @@ interface IComments {
 }
 
 export default async function AdminCommentPage() {
-  const cookieStore = cookies();
-  const token = (await cookieStore)?.get("token");
-  const payload = verifyTokenForPage(token?.value || "");
+  //verification
+const session=await auth();
 
-  if (!payload?.isAdmin) {
+  if (!session ||session.user.isAdmin) {
     redirect("/");
   }
 
   const response = await fetch(`${domain_name}/api/comments`, {
     cache: "no-store",
-    headers: {
-      Cookie: `token=${token?.value}`,
-    },
+
   });
 
   if (!response.ok) {
@@ -125,7 +123,7 @@ export default async function AdminCommentPage() {
                       </td>
                       <td className="px-6 py-4">
                         <DeleteAndEditButton
-                          id={payload?.id}
+                          id={+session.user.id}
                           userId={c.userId}
                           commentId={c.id}
                           commentText={c.text}

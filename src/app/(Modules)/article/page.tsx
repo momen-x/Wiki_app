@@ -4,10 +4,9 @@ import { Article_In_All_Page } from "@/app/utils/CountOfArticleInPage";
 import SearchForm from "./_Components/SearchForm";
 import ArticlesList from "./_Components/ArticlesList";
 import Pagination from "./_Components/Pagination";
-import { cookies } from "next/headers";
-import { verifyTokenForPage } from "@/app/utils/verifyToken";
 import CreateArticle from "./_Components/CreateArticle";
 import NotAuthUser from "./_Components/NotAuthUser";
+import auth from "@/auth";
 
 interface IArticleData {
   userId: number;
@@ -58,9 +57,10 @@ async function fetchArticles(
 export default async function ArticlesPage({
   searchParams,
 }: ArticlesPageProps) {
-  const cookieStore = cookies();
-  const token = (await cookieStore)?.get("token");
-  const payload = verifyTokenForPage(token?.value || "");
+  //verification
+
+const session=await auth();
+
   const currentPage = Number((await searchParams).page) || 1;
   const searchQuery = (await searchParams).search || "";
 
@@ -72,12 +72,13 @@ export default async function ArticlesPage({
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {payload?.id ? (
+      {session && session.user.id ? (
         <>
           {/* Search Form - Client Component */}
           <SearchForm initialSearch={searchQuery} />
           {/* Add new Article form */}
-          <CreateArticle id={payload?.id} />
+          
+          <CreateArticle id={session.user.id} />
         </>
       ) : (
         <NotAuthUser message="Please log in to add a new article." />

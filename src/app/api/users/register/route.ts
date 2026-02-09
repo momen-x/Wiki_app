@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";     // ✅ or wherever your prisma.ts lives
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import { serialize } from "cookie";
 import RegisterSchema, {
   RegisterSchemaType,
 } from "@/app/(Modules)/(user)/register/_Validation/RegisterValidation";
+
+
+//to do
 
 /**
  * @method POST
@@ -25,10 +27,18 @@ export async function POST(request: NextRequest) {
       );
     }
     const user = await prisma.user.findUnique({ where: { email: body.email } });
+    
     const user1 = await prisma.user.findUnique({
       where: { username: body.username },
     });
-    if (user || user1) {
+    if (user) {
+      return NextResponse.json(
+        { message: "this user already registered" },
+        { status: 400 }
+      );
+    }
+
+    if (user1) {
       return NextResponse.json(
         { message: "this user already registered" },
         { status: 400 }
@@ -69,21 +79,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const token = jwt.sign(jwtPayload, process.env.JWT_SECRET);
-    const cookie = serialize("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 30, //30 days
-    });
+    // const token = jwt.sign(jwtPayload, process.env.JWT_SECRET);
+    // const cookie = serialize("token", token, {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === "production",
+    //   sameSite: "strict",
+    //   path: "/",
+    //   maxAge: 60 * 60 * 24 * 30, //30 days
+    // });
     return NextResponse.json(
       { user: newUser },
       {
         status: 201,
-        headers: {
-          "Set-Cookie": cookie,
-        },
+        // headers: {
+        //   "Set-Cookie": cookie,
+        // },
       }
     );
   } catch (error) {

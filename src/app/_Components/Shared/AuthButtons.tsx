@@ -22,7 +22,7 @@ export const AuthButtons = ({ payload, username }: AuthButtonsProps) => {
             {/* <span className="hidden lg:inline">Welcome, </span> */}
             <Link href={"/profile"}>
               <span className="truncate max-w-30 cursor-pointer text-black dark:text-white hover:underline">
-                {username && username.length < 7 ? username : username?.slice(0, 7) + "..."}
+                @{username && username.length < 7 ? username :( username?.slice(0, 7) + "...")}
               </span>
             </Link>
           </div>

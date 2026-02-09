@@ -11,7 +11,7 @@ interface IComments {
   id: number;
   updatedAt: Date;
   text: string;
-  user: { username: string };
+  user: { username?: string; name?: string };
   articleId: number;
   userId: number;
 }
@@ -64,12 +64,11 @@ deleteComment({ id });
       />
       {comments.map((c: IComments) => {
         return (
-          <div
-            key={c.id}
-            className="flex justify-between items-center mt-3"
-          >
+          <div key={c.id} className="flex justify-between items-center mt-3">
             <div className="bg-gray-300 dark:bg-gray-700 p-4 rounded-lg w-full mr-4">
-              <h3 className="font-semibold mb-1">{c.user.username}</h3>
+              <h3 className="font-semibold mb-1">
+                {c.user.username ? c.user.username : c.user.name}
+              </h3>
               <p className="text-gray-500 mb-1.5">{c.text}</p>
             </div>
             <div className="flex flex-col gap-2">
@@ -85,7 +84,9 @@ deleteComment({ id });
                         size={20}
                       />
                       <PencilIcon
-                        onClick={() => handleEditComment(c.id, c.articleId, c.text)}
+                        onClick={() =>
+                          handleEditComment(c.id, c.articleId, c.text)
+                        }
                         className="text-green-400 cursor-pointer hover:text-green-500 transition-colors"
                         size={20}
                       />

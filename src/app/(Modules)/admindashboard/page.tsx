@@ -3,14 +3,13 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { verifyTokenForPage } from "@/app/utils/verifyToken";
 import CreateArticle from "../article/_Components/CreateArticle";
+import auth from "@/auth";
 
 
 const AdminPage = async () => {
-  const cookieStore = cookies();
-  const token = (await cookieStore)?.get("token");
-  const payload = verifyTokenForPage(token?.value || "");
-
-  if (!payload?.isAdmin) {
+ 
+const session=await auth();
+  if (!session || !session.user.isAdmin) {
     redirect("/");
   }
   return (
@@ -29,7 +28,7 @@ const AdminPage = async () => {
             padding: "16p",
           }}
         >
-          <CreateArticle id={payload.id} />
+          <CreateArticle id={session.user.id} />
         </div>
       </div>
     </div>

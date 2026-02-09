@@ -44,7 +44,7 @@ const CreateArticle = ({ id }: { id: string | number }) => {
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto">
+    <div className="w-full max-w-3xl mx-auto mb-7">
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">

@@ -1,11 +1,12 @@
 import { prisma } from "@/lib/prisma";     
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/auth";
 
 interface IProps {
   params: Promise<{ id: string }>;
 }
-import jwt, { JwtPayload } from "jsonwebtoken";
-import { verifyToken } from "@/app/utils/verifyToken";
+//to do 
+
 import { UpdateArticleSchema } from "@/app/(Modules)/article/_Validation/CreateAndEditArticleSchema";
 /**
  *@method GEt
@@ -26,7 +27,7 @@ export async function GET(request: NextRequest, { params }: IProps) {
           orderBy: { createdAt: "desc" },
           include: {
             user: {
-              select: { username: true },
+              select: { username: true,name:true },
             },
           },
         },
@@ -63,20 +64,22 @@ export async function PUT(request: NextRequest, { params }: IProps) {
       );
     }
     const article = await prisma.article.findUnique({ where: { id } })
-    const va = verifyToken(request);
-    if (!va) {
+    
+    const session = await auth();
+    if (!session || !session.user) {
       return NextResponse.json(
-        { message: "u are not allowed to edit this comment , access denied" },
-        { status: 403 }
+        { message: "unauthorized" },
+        { status: 401 }
       );
-    } else {
-      if (article?.userId !== va.id) {
+    }
+ 
+      if (article?.userId !== parseInt(session.user.id)) {
         return NextResponse.json(
           { message: "u are not allowed to edit this comment , access denied" },
           { status: 403 }
         );
       }
-    }
+    
 
     const editArticle = await prisma.article.update({
       where: { id },
@@ -123,23 +126,19 @@ export async function DELETE(request: NextRequest, { params }: IProps) {
       );
     }
 
-    // Verify JWT token
-    const jwtToken = request.cookies.get("token");
-    if (!jwtToken) {
+    const session = await auth();
+    if (!session || !session.user) {
       return NextResponse.json(
-        { message: "Unauthorized: No token provided" },
+        { message: "Unauthorized: No session" },
         { status: 401 }
       );
     }
 
-    const token = jwtToken.value;
-    const userFromToken = jwt.verify(
-      token,
-      process.env.JWT_SECRET as string
-    ) as JwtPayload;
+    // Fetch user to check for admin privileges
+    const user = await prisma.user.findUnique({ where: { id: parseInt(session.user.id) } });
 
     // Check if user is either the author or an admin
-    if (article.userId !== userFromToken.id && !userFromToken.isAdmin) {
+    if (article.userId !== user?.id && !user?.isAdmin) {
       return NextResponse.json(
         {
           message:
@@ -162,15 +161,6 @@ export async function DELETE(request: NextRequest, { params }: IProps) {
       { status: 200 }
     );
   } catch (error) {
-    // Handle JWT errors
-    if (error instanceof jwt.JsonWebTokenError) {
-      return NextResponse.json({ message: "Invalid token" }, { status: 401 });
-    }
-
-    if (error instanceof jwt.TokenExpiredError) {
-      return NextResponse.json({ message: "Token expired" }, { status: 401 });
-    }
-
     console.error("Delete article error:", error);
     return NextResponse.json(
       { message: "Internal server error" },

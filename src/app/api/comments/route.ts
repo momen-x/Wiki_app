@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";    
-import { verifyToken } from "@/app/utils/verifyToken"; 
 import CreateCommentSchema, {
   CreateCommentSchemaType,
 } from "@/app/(Modules)/_Comments/Validation/CreateAndEditComment";
+import auth from "@/auth";
 
 
 
@@ -15,9 +15,9 @@ import CreateCommentSchema, {
  */
 export async function POST(request: NextRequest) {
   try {
-    const user = verifyToken(request);
+  const session=await auth();
     
-    if (!user) {
+    if (!session) {
       return NextResponse.json(
         { message: "Unauthorized: Please log in to add comments" },
         { status: 401 }
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     }
     const newComment = await prisma.comment.create({
       data: {
-        userId: user.id, // Get user ID from verified token
+        userId: +session.user.id, // Get user ID from verified token
         text: body.text,
         articleId: body.articleId,
       },
@@ -74,10 +74,10 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
-    const user = verifyToken(request);
+    const session =await auth();
 
     // Check if user is not authenticated
-    if (user === null) {
+    if (!session) {
       return NextResponse.json(
         { message: "Unauthorized: Please log in" },
         { status: 401 }
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if user is not admin
-    if (!user.isAdmin) {
+    if (!session.user.isAdmin) {
       return NextResponse.json(
         { message: "Access denied: Only admins can view all comments" },
         { status: 403 }

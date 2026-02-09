@@ -4,7 +4,7 @@ import userRegister from "../Repo/resRegister";
 import { toast } from "react-toastify";
 
 
-export const useRegister=(onSuccess:()=>void):UseMutationResult<void,Error,RegisterSchemaType>=>{
+export const useRegister=(onSuccess:()=>void,onError:(error:any)=>void):UseMutationResult<void,Error,RegisterSchemaType>=>{
     const queryClient = useQueryClient();
    
     return useMutation({
@@ -15,11 +15,12 @@ export const useRegister=(onSuccess:()=>void):UseMutationResult<void,Error,Regis
      queryClient.invalidateQueries({
             queryKey: ["register",variables.email],
           });
-           toast.success("registered successful!");
+        
                
         },
     
         onError: (error) => {
+            onError(error);
           console.error("Error registering user", error?.message);
         },}        
     )

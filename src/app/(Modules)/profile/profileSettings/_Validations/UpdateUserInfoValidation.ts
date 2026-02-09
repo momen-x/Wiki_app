@@ -1,7 +1,8 @@
 import z from "zod"
 
 const UpdateUserSchema = z.object({
-    username: z.string().min(1, "Name is required").optional(),
+    username: z.string().min(1, "Username is required").optional(),
+    
     // email: z.string().min(1, "Email is required").email("Invalid email address").optional(),
 })
 

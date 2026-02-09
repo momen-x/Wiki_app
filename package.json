@@ -12,6 +12,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@auth/prisma-adapter": "^2.11.1",
     "@hookform/resolvers": "^5.2.2",
     "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^6.19.2",
@@ -22,14 +23,12 @@
     "@tanstack/react-query": "^5.90.20",
     "@tanstack/react-query-devtools": "^5.91.3",
     "@types/js-cookie": "^3.0.6",
-    "@types/jsonwebtoken": "^9.0.10",
     "axios": "^1.11.0",
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cookie": "^1.0.2",
     "js-cookie": "^3.0.5",
-    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.563.0",
     "next": "^15.4.5",
     "next-auth": "^5.0.0-beta.30",

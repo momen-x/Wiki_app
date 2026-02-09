@@ -12,7 +12,6 @@ import { Button } from "@/app/_Components/ui/button";
 import { domain_name } from "@/app/utils/Domain";
 import { useState } from "react";
 import { AlertTriangle } from "lucide-react";
-// to do using tanStack library to handle edit the user info (password , (email or password)) , and deleting his account
 interface IDeleteAccountDialogProps {
   id: string;
   open: boolean;

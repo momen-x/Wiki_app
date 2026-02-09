@@ -1,28 +1,31 @@
-import { NextResponse, NextRequest } from "next/server";
+// middleware.ts
+import NextAuth from "next-auth"
+import authConfig from "./auth.config"
+import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
 
-export function middleware(request: NextRequest) {
-  const jwtToken = request.cookies.get("token");
-  const token = jwtToken?.value as string;
-  // const authToken = request.headers.get("token") as string;
-  if (!token) {
-    if (request.nextUrl.pathname.startsWith("/api/users/profile/")) {
-      return NextResponse.json(
-        { message: "No token provided, access denied" },
-        { status: 401 }
-      );
-    } else if (request.nextUrl.pathname === "/profile") {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
-  } else {
-    if (
-      request.nextUrl.pathname === "/login" ||
-      request.nextUrl.pathname === "/register"
-    ) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
+const { auth } = NextAuth(authConfig)
+
+export default auth(async function middleware(req: NextRequest) {
+  const session = await auth();
+  const isAuthenticated = !!session?.user;
+  
+  const isAuthPage = req.nextUrl.pathname.startsWith('/login') || 
+                     req.nextUrl.pathname.startsWith('/register');
+  
+  // If user is authenticated and trying to access auth pages, redirect to home
+  if (isAuthenticated && isAuthPage) {
+    return NextResponse.redirect(new URL('/', req.url));
   }
-}
+  
+  // If user is not authenticated and trying to access protected pages, redirect to login
+  if (!isAuthenticated && !isAuthPage) {
+    return NextResponse.redirect(new URL('/login', req.url));
+  }
+  
+  return NextResponse.next();
+})
 
 export const config = {
-  matcher: ["/api/user/profile/:path*", "/login", "/register", "/profile"],
-};
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+}
