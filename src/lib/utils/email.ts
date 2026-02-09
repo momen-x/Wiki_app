@@ -1,13 +1,14 @@
+import { domain_name } from "@/app/utils/Domain";
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const domain = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
 
 export const sendVerificationEmail = async (
   email: string,
   token: string
 ): Promise<{ success: boolean; error?: string }> => {
-  const verificationLink = `${domain}/verify?token=${token}`;
+  const verificationLink = `${domain_name}/verify?token=${token}`;
 
   try {
     const { data, error } = await resend.emails.send({
