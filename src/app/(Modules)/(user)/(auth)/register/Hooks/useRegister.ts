@@ -7,22 +7,25 @@ export const useRegister=(onSuccess:()=>void,onError:(error:any)=>void):UseMutat
     const queryClient = useQueryClient();
    
     return useMutation({
-        mutationFn:(data:RegisterSchemaType)=>
-            userRegister.register(data),
-        onSuccess:(_data,variables)=>{
-            onSuccess();
-     queryClient.invalidateQueries({
-            queryKey: ["register",variables.email],
-          });
-        
-               
-        },
-    
-        onError: (error) => {
-            onError(error);
-          console.error("Error registering user", error?.message);
-        },}        
-    )
+      mutationFn: (data: RegisterSchemaType) => userRegister.register(data),
+      onSuccess: (_data, variables) => {
+        onSuccess();
+        queryClient.invalidateQueries({
+          queryKey: ["register", variables.email],
+        });
+      },
+
+      onError: (error: any) => {
+        console.error("❌ Registration error:", {
+          message: error?.message,
+          status: error?.response?.status,
+          statusText: error?.response?.statusText,
+          data: error?.response?.data,
+          url: error?.config?.url,
+        });
+        onError(error);
+      },
+    });
 
 
 }

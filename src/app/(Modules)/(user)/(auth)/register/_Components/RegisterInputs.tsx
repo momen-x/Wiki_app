@@ -46,12 +46,18 @@ const RegisterInput = () => {
       setLoading(false);
     },
     (error:any) => {
-      if (error.response?.status === 401) {
+      const errorMessage = error?.response?.data?.message || error?.message;
+
+      if (error.response?.status === 400) {
+        toast.error(errorMessage || "Invalid input. Please check your data.");
+      } else if (error.response?.status === 401) {
         toast.error("Invalid email or password");
       } else if (error.response?.status >= 500) {
         toast.error("Server error. Please try again later.");
+      } else if (!error.response) {
+        toast.error("Network error. Please check your connection.");
       } else {
-        toast.error("Registration failed.");
+        toast.error(errorMessage || "Registration failed.");
       }
       setLoading(false);
     },
