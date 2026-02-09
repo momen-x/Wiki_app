@@ -24,8 +24,6 @@ export const sendVerificationEmail = async (
               .button { 
                 display: inline-block; 
                 padding: 12px 24px; 
-                background-color: #4F46E5; 
-                color: white; 
                 text-decoration: none; 
                 border-radius: 6px; 
                 margin: 20px 0;

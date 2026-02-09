@@ -2,6 +2,8 @@ import React from "react";
 import { ArrowRight, BadgeCheck, CircleX } from "lucide-react";
 import Link from "next/link";
 import { verifyToken } from "@/lib/Actions/verifyToken";
+import auth from "@/auth";
+import { redirect } from "next/navigation";
 
 interface VerifyPageProps {
   searchParams: Promise<{ token?: string }>;
@@ -9,6 +11,10 @@ interface VerifyPageProps {
 
 const VerifyPage = async ({ searchParams }: VerifyPageProps) => {
   const { token } = await searchParams;
+  const session=await auth();
+  if(session){
+    redirect("/");
+  }
 
   // Handle missing token
   if (!token) {

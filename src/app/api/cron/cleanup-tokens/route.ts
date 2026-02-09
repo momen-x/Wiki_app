@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { cleanupExpiredTokens } from "@/lib/utils/token";
 
 /**
  * @method GET
@@ -11,7 +10,7 @@ import { cleanupExpiredTokens } from "@/lib/utils/token";
 export async function GET() {
   try {
     // Clean up expired tokens
-    const deletedTokens = await cleanupExpiredTokens();
+    // const deletedTokens = await cleanupExpiredTokens();
 
     // Delete unverified users older than 24 hours
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
@@ -26,7 +25,7 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
-      deletedTokens,
+      // deletedTokens,
       deletedUsers: deletedUsers.count,
     });
   } catch (error) {
