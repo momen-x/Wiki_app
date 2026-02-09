@@ -1,7 +1,6 @@
 import {  useMutation,UseMutationResult,useQuery, useQueryClient } from "@tanstack/react-query";
 import { RegisterSchemaType } from "../_Validation/RegisterValidation";
 import userRegister from "../Repo/resRegister";
-import { toast } from "react-toastify";
 
 
 export const useRegister=(onSuccess:()=>void,onError:(error:any)=>void):UseMutationResult<void,Error,RegisterSchemaType>=>{

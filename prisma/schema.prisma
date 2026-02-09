@@ -13,10 +13,10 @@ datasource db {
 
 model User {
   id            Int             @id @default(autoincrement())
-  name          String? 
-   image         String?         // ADD THIS LINE IF NOT PRESENT
-  email         String?          @unique
-  username      String?          @unique @db.VarChar(50)
+  name          String?
+  image         String? // ADD THIS LINE IF NOT PRESENT
+  email         String?         @unique
+  username      String?         @unique @db.VarChar(50)
   emailVerified DateTime?
   accounts      Account[]
   sessions      Session[]
@@ -61,12 +61,14 @@ model Session {
 }
 
 model VerificationToken {
-  identifier String
-  token      String
-  expires    DateTime
+  id      String   @default(cuid())
+  token   String
+  expires DateTime
+  email   String
 
-  @@id([identifier, token])
+  @@unique([email, token])
 }
+
 
 model Article {
   id          Int       @id @default(autoincrement())

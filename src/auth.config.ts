@@ -2,8 +2,8 @@ import type { NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import LoginSchema from "./app/(Modules)/(user)/login/_Validations/LoginValidation";
 import { PrismaClient } from "@prisma/client";
+import LoginSchema from "./app/(Modules)/(user)/(auth)/login/_Validations/LoginValidation";
 
  //to do  handle the register form and sure  the email user is unique then be sure if is correct  or not  and send email on his email 
  // add forgot password page and verification email page 

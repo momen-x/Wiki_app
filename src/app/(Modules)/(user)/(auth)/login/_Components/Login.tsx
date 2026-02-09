@@ -1,9 +1,8 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import LoginSchema, { LoginSchemaType } from "../_Validations/LoginValidation";
-import { toast } from "react-toastify";
 import {
   Card,
   CardContent,
@@ -31,7 +30,8 @@ const LoginInput = () => {
   });
 
   const { mutate: LoginUser, isPending } = useLogin();
-  const router = useRouter();
+  const searchParams = useSearchParams();
+  const registered = searchParams.get("registered");
 
   const submit = async (data: LoginSchemaType) => {
     // Form is already validated by react-hook-form at this point
@@ -41,6 +41,15 @@ const LoginInput = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md">
+        {registered === "true" && (
+          <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg text-center">
+            <p className="font-bold">Registration Successful!</p>
+            <p className="text-sm">
+              Please check your inbox to verify your email before logging in.
+            </p>
+          </div>
+        )}
+
         <Card className="shadow-xl border-gray-200">
           <CardHeader className="text-center space-y-1">
             <div className="flex justify-center mb-4">

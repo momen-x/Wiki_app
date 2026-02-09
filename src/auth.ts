@@ -9,8 +9,9 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   ...authConfig,
   adapter: PrismaAdapter(prisma) as any,
   session: { strategy: "jwt" },
-  
+
   callbacks: {
+    ...authConfig.callbacks,
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
@@ -29,6 +30,40 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         session.user.isAdmin = (token.isAdmin as boolean) ?? false;
       }
       return session;
+    },
+    async signIn({ user, account }) {
+      // Allow OAuth providers (Google, etc.)
+      if (account?.provider !== "credentials") {
+        return true;
+      }
+
+      // For credentials provider, check email verification
+      if (!user.email) {
+        return false;
+      }
+
+      const userFromDb = await prisma.user.findUnique({
+        where: { email: user.email },
+        select: { emailVerified: true },
+      });
+
+      // Block login if email not verified
+      if (!userFromDb?.emailVerified) {
+        console.log("❌ Login blocked: Email not verified for", user.email);
+        return false; // This will show an error to the user
+      }
+
+      return true;
+    },
+  },
+  events: {
+    async linkAccount({ user }) {
+      if (user.id) {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { emailVerified: new Date() },
+        });
+      }
     },
   },
 });

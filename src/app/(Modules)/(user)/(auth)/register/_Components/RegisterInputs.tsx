@@ -24,7 +24,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/app/_Components/ui/card";
-const LoginInput = () => {
+const RegisterInput = () => {
   const form = useForm<RegisterSchemaType>({
     mode: "onBlur",
     resolver: zodResolver(RegisterSchema),
@@ -40,7 +40,7 @@ const LoginInput = () => {
 
   const { mutate: registerUser } = useRegister(
     () => {
-      toast.success("Registration successful");
+      toast.success("Check from your email to continues");
       router.replace("/login");
       // window.location.reload();
       setLoading(false);
@@ -185,4 +185,4 @@ const LoginInput = () => {
   );
 };
 
-export default LoginInput;
+export default RegisterInput;
