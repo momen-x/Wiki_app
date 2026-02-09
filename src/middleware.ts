@@ -1,31 +1,27 @@
-// middleware.ts
-import NextAuth from "next-auth"
-import authConfig from "./auth.config"
-import { NextResponse } from "next/server"
-import type { NextRequest } from "next/server"
+import NextAuth from "next-auth";
+import authConfig from "./auth.config";
 
-const { auth } = NextAuth(authConfig)
+const { auth } = NextAuth(authConfig);
 
-export default auth(async function middleware(req: NextRequest) {
-  const session = await auth();
-  const isAuthenticated = !!session?.user;
+export default auth((req) => {
+  const isAuthenticated = !!req.auth; // auth is already available here!
   
   const isAuthPage = req.nextUrl.pathname.startsWith('/login') || 
                      req.nextUrl.pathname.startsWith('/register');
   
   // If user is authenticated and trying to access auth pages, redirect to home
   if (isAuthenticated && isAuthPage) {
-    return NextResponse.redirect(new URL('/', req.url));
+    return Response.redirect(new URL('/', req.url));
   }
   
   // If user is not authenticated and trying to access protected pages, redirect to login
   if (!isAuthenticated && !isAuthPage) {
-    return NextResponse.redirect(new URL('/login', req.url));
+    return Response.redirect(new URL('/login', req.url));
   }
-  
-  return NextResponse.next();
-})
+});
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
-}
+  matcher: [
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$).*)',
+  ],
+};
