@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import RegisterSchema, {
   RegisterSchemaType,
 } from "@/app/(Modules)/(user)/(auth)/register/_Validation/RegisterValidation";
-import generateVerificationToken from "@/app/utils/generateVerificationToken";
+import generateVerificationToken from "@/lib/utils/generateVerificationToken";
 import { sendVerificationEmail } from "@/lib/utils/email";
 
 /**

@@ -1,6 +1,5 @@
 "use client"
 import React, { useState, useEffect } from "react";
-import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/app/_Components/ui/dialog";
 import { Form } from "@/app/_Components/ui/form";
@@ -10,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import ValidationInput from "@/app/_Components/Inputs/ValidationInput";
 import { Button } from "@/app/_Components/ui/button";
 import { useEditComment } from "../Hooks/useEditComment";
+import { toast } from "react-toastify";
 
 interface IProps {
   open: boolean;

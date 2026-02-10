@@ -1,6 +1,4 @@
 "use client"
-import axios from "axios";
-import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import DeleteAccount, { DeleteAccountType } from '../_Validations/CheckPasswordToDeleteAccount';
@@ -12,6 +10,7 @@ import { Button } from "@/app/_Components/ui/button";
 import { domain_name } from "@/app/utils/Domain";
 import { useState } from "react";
 import { AlertTriangle } from "lucide-react";
+import { toast } from "react-toastify";
 interface IDeleteAccountDialogProps {
   id: string;
   open: boolean;

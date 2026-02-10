@@ -1,14 +1,21 @@
 import { useState } from "react";
-import axios from "axios";
-import { toast } from "sonner";
-import { domain_name } from "@/app/utils/Domain";
-import { Dialog, DialogContent, DialogTitle } from "@/app/_Components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "@/app/_Components/ui/dialog";
 import { Form } from "@/app/_Components/ui/form";
 import ValidationInput from "@/app/_Components/Inputs/ValidationInput";
 import { useForm } from "react-hook-form";
-import { UpdateUserPasswordType, UpdateUserPassword } from "../_Validations/UpdateUserInfoValidation";
+import {
+  UpdateUserPasswordType,
+  UpdateUserPassword,
+} from "../_Validations/UpdateUserInfoValidation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/app/_Components/ui/button";
+import { toast } from "react-toastify";
+import axios from "axios";
+import { domain_name } from "@/app/utils/Domain";
 
 interface PasswordDialogProps {
   id: string;
@@ -16,7 +23,11 @@ interface PasswordDialogProps {
   setOpen: (open: boolean) => void;
 }
 
-const DialogEditPasswordAccount = ({ id, open, setOpen }: PasswordDialogProps) => {
+const DialogEditPasswordAccount = ({
+  id,
+  open,
+  setOpen,
+}: PasswordDialogProps) => {
   const form = useForm<UpdateUserPasswordType>({
     mode: "onBlur",
     resolver: zodResolver(UpdateUserPassword),
@@ -70,17 +81,15 @@ const DialogEditPasswordAccount = ({ id, open, setOpen }: PasswordDialogProps) =
     if (!validateForm()) return;
 
     try {
-      // await axios.put(`${domain_name}/api/users/profile/${id}`, {
-      //   oldPassword: data.oldPassword,
-      //   password: data.newPassword,
-      // });
-      
-
+    const response= await axios.put(`${domain_name}/api/users/profile/${id}`, 
+      data
+      );
       toast.success("Password updated successfully");
       handleClose();
     } catch (error: any) {
       if (error.response) {
-        const message = error.response.data.message || "Failed to update password";
+        const message =
+          error.response.data.message || "Failed to update password";
         if (message.includes("current password")) {
           setErrors((prev) => ({ ...prev, oldPassword: message }));
         } else {
@@ -96,9 +105,13 @@ const DialogEditPasswordAccount = ({ id, open, setOpen }: PasswordDialogProps) =
     <Dialog open={open}>
       <DialogTitle>Update Password</DialogTitle>
       <DialogContent>
-        To change your password, please enter your current password and then your new password.
+        To change your password, please enter your current password and then
+        your new password.
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handlePasswordChange)} className="space-y-5">
+          <form
+            onSubmit={form.handleSubmit(handlePasswordChange)}
+            className="space-y-5"
+          >
             <ValidationInput<UpdateUserPasswordType>
               fieldTitle="Enter your old password"
               nameInSchema="oldPassword"

@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";     
 import bcrypt from "bcryptjs";
 import auth from "@/auth";
+import  {UpdateUserSchema,
+  UpdateUserPassword,
+} from "@/app/(Modules)/profile/profileSettings/_Validations/UpdateUserInfoValidation";
 
-//it's so important to fix this code 
 
 
 
@@ -11,6 +13,202 @@ import auth from "@/auth";
 interface IProps {
   params: Promise<{ id: string }>;
 }
+
+
+/**
+ * @method GET
+ * @route ~/api/users/profile/:id
+ * @description Get profile by id , every user can show the articles on the another users
+ * @access public
+ */
+export async function GET(request: NextRequest, { params }: IProps) {
+  try {
+    const id = +(await params).id;
+    if (isNaN(id)) {
+      return NextResponse.json(
+        { message: "this user is not found" },
+        { status: 404 }
+      );
+    }
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: {
+        // comments: true,
+        id: true,
+        username: true,
+        name:true,
+        email: true,
+        createdAt: true,
+        articles: {
+          select: {
+            title: true,
+            description: true,
+            updatedAt: true,
+            id: true,
+            comments: {
+              select: { text: true, id: true, userId: true, createdAt: true },
+            },
+          },
+        },
+      },
+    });
+    if (!user) {
+      NextResponse.json({ message: "the user is not found" }, { status: 404 });
+    }
+
+
+
+      return NextResponse.json({ message: user }, { status: 200 });
+    
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * @method PUT
+ * @route ~/api/users/profile/[id]
+ * @description edit account by user themselves
+ * @access private
+ */
+export async function PUT(request: NextRequest, { params }: IProps) {
+  try {
+    const id = +(await params).id;
+    if (isNaN(id)) {
+      return NextResponse.json({ message: "Invalid user ID" }, { status: 400 });
+    }
+
+    const session = await auth();
+    if (!session) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    if (Number(session?.user.id) !== id) {
+      return NextResponse.json(
+        { message: "Unauthorized: You can only edit your own account" },
+        { status: 403 }
+      );
+    }
+
+    const user = await prisma.user.findUnique({ where: { id } });
+    if (!user) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
+    const body = await request.json();
+    console.log("Request body:", body);
+
+    // Prepare data object for update
+    const updateData: any = {};
+
+    // Check if user wants to update password
+    const passwordValidation = UpdateUserPassword.safeParse(body);
+    if (passwordValidation.success) {
+      
+      const { oldPassword, newPassword } = passwordValidation.data;
+
+      // Verify old password
+      const isPasswordValid = await bcrypt.compare(
+        oldPassword,
+        user.password || ""
+      );
+      
+      if (!isPasswordValid) {
+        return NextResponse.json(
+          { message: "Current password is incorrect" },
+          { status: 400 }
+        );
+      }
+
+      // Hash new password
+      const salt = await bcrypt.genSalt(10);
+      updateData.password = await bcrypt.hash(newPassword, salt);
+    } else if (body.oldPassword || body.newPassword || body.confirmNewPassword) {
+      // If any password field is present but validation failed, return the error
+      return NextResponse.json(
+        { 
+          message: "Password validation failed",
+          errors: passwordValidation.error.issues[0].message 
+        },
+        { status: 400 }
+      );
+    }
+
+    // Check if user wants to update username
+    const usernameValidation = UpdateUserSchema.safeParse(body);
+    if (usernameValidation.success && body.username) {
+      console.log("Processing username update");
+      
+      // Only check uniqueness if username is actually changing
+      if (body.username !== user.username) {
+        const existingUser = await prisma.user.findFirst({
+          where: {
+            username: body.username,
+            NOT: { id },
+          },
+        });
+
+        if (existingUser) {
+          return NextResponse.json(
+            { message: "This username is already taken" },
+            { status: 400 }
+          );
+        }
+
+        updateData.username = body.username;
+      }
+    } else if (body.username !== undefined && !usernameValidation.success) {
+      // If username is present but validation failed, return the error
+      return NextResponse.json(
+        { 
+          message: "Username validation failed",
+          errors: usernameValidation.error.issues[0].message 
+        },
+        { status: 400 }
+      );
+    }
+
+    // Check if there's anything to update
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json(
+        { message: "No valid fields to update" },
+        { status: 400 }
+      );
+    }
+
+    // Perform the update
+    const updatedUser = await prisma.user.update({
+      where: { id },
+      data: updateData,
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        isAdmin: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    return NextResponse.json(
+      {
+        message: "User updated successfully",
+        user: updatedUser,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Profile update error:", error);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
 /**
  * @method DELETE
  * @route ~/api/users/profile/[id]
@@ -79,186 +277,6 @@ export async function DELETE(request: NextRequest, { params }: IProps) {
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 },
-    );
-  }
-}
-
-/**
- * @method GET
- * @route ~/api/users/profile/:id
- * @description Get profile by id , every user can show the articles on the another users
- * @access public
- */
-export async function GET(request: NextRequest, { params }: IProps) {
-  try {
-    const id = +(await params).id;
-    if (isNaN(id)) {
-      return NextResponse.json(
-        { message: "this user is not found" },
-        { status: 404 }
-      );
-    }
-    const user = await prisma.user.findUnique({
-      where: { id },
-      select: {
-        // comments: true,
-        id: true,
-        username: true,
-        name:true,
-        email: true,
-        createdAt: true,
-        articles: {
-          select: {
-            title: true,
-            description: true,
-            updatedAt: true,
-            id: true,
-            comments: {
-              select: { text: true, id: true, userId: true, createdAt: true },
-            },
-          },
-        },
-      },
-    });
-    if (!user) {
-      NextResponse.json({ message: "the user is not found" }, { status: 404 });
-    }
-
-
-
-      return NextResponse.json({ message: user }, { status: 200 });
-    
-  } catch (error) {
-    return NextResponse.json(
-      { message: "Internal server error" },
-      { status: 500 }
-    );
-  }
-}
-
-/**
- * @method PUT
- * @route ~/api/users/profile/[id]
- * @description edit account by user themselves
- * @access private
- */
-export async function PUT(request: NextRequest, { params }: IProps) {
-  try {
-    const id = +(await params).id;
-    if (isNaN(id)) {
-      return NextResponse.json({ message: "Invalid user ID" }, { status: 400 });
-    }
-
-    const user = await prisma.user.findUnique({ where: { id } });
-    if (!user) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
-    }
-
-    // Verify the user is authorized to make changes
-    // const jwtToken = request.cookies.get("token");
-    // const token = jwtToken?.value as string;
-    // const userFromToken = jwt.verify(
-    //   token,
-    //   process.env.JWT_SECRET as string
-    // ) as JwtPayload;
-    const session = await auth();
-    if (!session) {
-      return NextResponse.json({ message: "unauthorized" }, { status: 400 });
-    }
-    if (Number(session?.user.id) !== id) {
-      return NextResponse.json(
-        { message: "Unauthorized: You can only edit your own account" },
-        { status: 403 },
-      );
-    }
-
-    const body = await request.json();
-
-    // Handle password change separately
-    if (body.oldPassword && body.password) {
-      const isPasswordValid = await bcrypt.compare(
-        body.oldPassword,
-        user.password || "",
-      );
-      if (!isPasswordValid) {
-        return NextResponse.json(
-          { message: "Current password is incorrect" },
-          { status: 400 },
-        );
-      }
-
-      const salt = await bcrypt.genSalt(10);
-      body.password = await bcrypt.hash(body.password, salt);
-      delete body.oldPassword;
-    }
-
-    // Validate username uniqueness
-    if (body.username && body.username?.trim() !== "") {
-      const existingUser = await prisma.user.findFirst({
-        where: {
-          username: body.username,
-          NOT: { id },
-        },
-      });
-      if (existingUser) {
-        return NextResponse.json(
-          { message: "This username is already taken" },
-          { status: 400 },
-        );
-      }
-    }
-
-    const updatedUser = await prisma.user.update({
-      where: { id },
-      data: body,
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        isAdmin: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
-
-    // Generate new token with updated user data
-    // const newToken = jwt.sign(
-    //   {
-    //     id: updatedUser.id,
-    //     username: updatedUser.username,
-    //     email: updatedUser.email,
-    //     isAdmin: updatedUser.isAdmin,
-    //   },
-    //   process.env.JWT_SECRET as string,
-    //   { expiresIn: "30d" },
-    // );
-
-    // Prepare the response
-    const response = NextResponse.json(
-      {
-        message: "User updated successfully",
-        user: updatedUser,
-      },
-      { status: 200 },
-    );
-
-    // Set the new token in cookies
-    // response.cookies.set({
-    //   name: TOKEN_COOKIE_NAME,
-    //   value: newToken,
-    //   httpOnly: true,
-    //   secure: process.env.NODE_ENV === "production",
-    //   sameSite: "strict",
-    //   maxAge: 60 * 60 * 24 * 30, // 30 days
-    //   path: "/",
-    // });
-
-    return response;
-  } catch (error) {
-    console.error("Profile update error:", error);
-    return NextResponse.json(
-      { message: "Internal server error" },
-      { status: 500 }
     );
   }
 }

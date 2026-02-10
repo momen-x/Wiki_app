@@ -84,6 +84,12 @@ const LoginInput = () => {
                       className="h-12"
                     />
                   </div>
+                  <div> 
+                    <p className="text-shadow-white dark:text-gray-500 text-xs">Do you forgot your password  <Link href={"/forgotpassword"}>
+                    <strong className="text-gray-400 dark:text-gray-700">Enter here </strong>
+                    </Link>
+                    </p>
+                  </div>
 
                   <Button
                     type="button"

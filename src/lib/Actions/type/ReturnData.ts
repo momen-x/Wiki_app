@@ -1,7 +1,7 @@
 export interface IReturnData {
   type: "success" | "error";
   message: string;
-  open: boolean;
+  open?: boolean;
 }
 
 export interface VerificationTokenData {

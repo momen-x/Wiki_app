@@ -1,18 +1,18 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Toaster, toast } from "sonner";
 import axios from "axios";
 import { domain_name } from "../../../../utils/Domain";
 import { useRouter } from "next/navigation";
 import DeleteAccountDialog from "./DeleteAccountDialog";
 import { useForm } from "react-hook-form";
-import UpdateUserSchema, { UpdateUserSchemaType } from "../_Validations/UpdateUserInfoValidation";
+import  {UpdateUserSchema, UpdateUserSchemaType } from "../_Validations/UpdateUserInfoValidation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/app/_Components/ui/form";
 import ValidationInput from "@/app/_Components/Inputs/ValidationInput";
 import { LockIcon, Mail, User, Shield, AlertTriangle } from "lucide-react";
 import { Button } from "@/app/_Components/ui/button";
 import DialogEditPasswordAccount from "./DialogEditPasswordAccount";
+import { toast } from "react-toastify";
 
 interface UserData {
   username: string;
@@ -112,7 +112,6 @@ const EditAccountInformation = ({ id }: { id: string }) => {
         open={openDeleteAccountDialog}
         setOpen={setOpenDeleteAccountDialog}
       />
-      <Toaster position="top-right" richColors />
 
       <div className="mb-8 text-center">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">

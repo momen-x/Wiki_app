@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { FolderLock } from "lucide-react";
 import Link from "next/link";
-import { Toaster } from "sonner";
 import { domain_name } from "@/app/utils/Domain";
 import { IUserProfile } from "@/app/(Modules)/profile/types/types";
 import { ProfileHeader } from "./_Components/ProfileHeader";
@@ -27,7 +26,7 @@ const ProfilePage = async () => {
 
     return (
       <div className="container mx-auto px-4 py-8 max-w-5xl transition-colors">
-        <Toaster position="top-right" richColors />
+    
 
         {/* Header Section */}
         <div className="flex justify-between items-center mb-10 mt-4">
