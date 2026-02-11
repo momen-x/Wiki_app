@@ -6,6 +6,7 @@ import {
   NewspaperIcon,
   MessageSquareTextIcon,
   LayoutPanelTop,
+  Users,
 } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
@@ -18,12 +19,14 @@ interface DashboardLayoutProps {
 }
 
 const pages = [
-  { icon: LayoutDashboardIcon , label: "Dashboard", path: "/admindashboard" },
+  { icon:  LayoutDashboardIcon , label: "Dashboard", path: "/admindashboard" },
+  { icon: Users , label: "Users", path: "/admindashboard/users" },
   { icon: NewspaperIcon , label: "Articles", path: "/admindashboard/articles" },
   { icon: MessageSquareTextIcon , label: "Comments", path: "/admindashboard/comments" },
 
 ];
 const Dashboard =(  { children }: DashboardLayoutProps) => {
+  
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const toggleSidebar = () => {

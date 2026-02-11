@@ -1,14 +1,21 @@
 "use client";
-
-import axios from "axios";
-import React, { useState } from "react";
-import { domain_name } from "../../../utils/Domain";
 import { useRouter } from "next/navigation";
-import EditArticleDialog from "../../article/[id]/_Components/EditArticleDialog";
-import EditCommentDialog from "@/app/(Modules)/_Comments/Components/EditCommentDialog";
 import { Button } from "../../../_Components/ui/button";
+import { useEditArticleDialog } from "../../article/Context/EditArticleDialogContext";
+import { useEditCommentDialog } from "../../_Comments/Context/EditCommentDialogContext";
+import { useDeleteArticle } from "../../article/Hooks/useDeleteArticle";
+import { useDeleteComment } from "../../_Comments/Hooks/useDeleteComment";
+import { toast } from "react-toastify";
 
-
+interface DeleteAndEditButtonProps {
+  id: number;
+  userId: number;
+  commentId?: number;
+  articleId?: number;
+  title?: string;
+  description?: string;
+  commentText?: string;
+}
 const DeleteAndEditButton = ({
   id,
   userId,
@@ -16,88 +23,62 @@ const DeleteAndEditButton = ({
   articleId,
   title,
   description,
-  commentText
-
-
-}:{id:number,userId:number,commentId?:number,articleId?:number,title?:string,description?:string,commentText?:string} ) => {
+  commentText,
+}: DeleteAndEditButtonProps) => {
   const router = useRouter();
-  const [openEditArticleDialog, setOpenEditArticleDialog] = useState(false);
-  const [openEditCommentDialog, setOpenEditCommentDialog] = useState(false);
+  const { openDialog } = useEditArticleDialog();
+  const { openDialog: openEditCommentDialog } = useEditCommentDialog();
+  const { mutate: deleteArticle } = useDeleteArticle(() => {
+    toast.success("the Article deleted successfully");
+    router.refresh();
+  });
+  const { mutate: deleteComment } = useDeleteComment(() => {
+    toast.success("The comment delete successfully");
+    router.refresh();
+  });
 
   const handleDelete = async () => {
     if (commentId) {
-      try {
-        if (confirm("are u sure u want delete this comment")) {
-          const response = await axios.delete(
-            `${domain_name}/api/comments/${commentId}`,
-          );
-
-          router.refresh();
-        }
-      } catch {
-        return;
+      if (confirm("Are you sure you want to delete this comment?")) {
+        deleteComment({ id: commentId });
       }
-    }
-    if (articleId) {
-      try {
-        if (confirm("are u sure u want delete this article")) {
-          await axios.delete(`${domain_name}/api/articles/${articleId}`);
 
-          router.refresh();
-        }
-      } catch {
-        return;
-      }
+      return;
+    } else if (articleId) {
+      const confirmDeleting = confirm(
+        "are you sure you want do delete this article",
+      );
+      if (confirmDeleting) deleteArticle(articleId);
     }
   };
 
-  const handleEditComment = () => {
-    if (articleId) {
-      setOpenEditArticleDialog(true);
+  const handleEdit = () => {
+    if (articleId && title && description) {
+      openDialog(articleId, title, description, userId);
     } else if (commentId) {
-      setOpenEditCommentDialog(true);
+      openEditCommentDialog(commentId, commentText || "");
     }
   };
-
   return (
-    <React.Fragment>
-      <EditArticleDialog
-        id={articleId || 0}
-        open={openEditArticleDialog}
-        setOpen={setOpenEditArticleDialog}
-        title={title || ""}
-        description={description || ""}
-        userId={userId}
-      />
-      <EditCommentDialog
-        open={openEditCommentDialog}
-        setOpen={setOpenEditCommentDialog}
-        id={commentId || 0}
-        text={commentText || ""}
-      />
-
-      {id === userId ? (
+    <>
+      {id === userId && (
         <Button
           variant="default"
-          color="primary"
-          onClick={handleEditComment}
+          onClick={handleEdit}
           className="cursor-pointer"
         >
           Edit
         </Button>
-      ) : (
-        ""
       )}
       <Button
         variant="destructive"
-        color="error"
         onClick={handleDelete}
         style={{ marginLeft: "8px" }}
         className="cursor-pointer"
       >
         Delete
       </Button>
-    </React.Fragment>
+    </>
   );
 };
 

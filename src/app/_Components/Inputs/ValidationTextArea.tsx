@@ -36,7 +36,7 @@ export default function ValidationInput<T>({
           </FormLabel>
           <FormControl>
             <Textarea
-            style={{ height:'100px',resize:"none" }}
+            style={{resize:"none" }}
               id={nameInSchema}
               className={`w-full max-w-xs disabled:text-blue-500 dark:disabled:text-yellow-300 disabled:opacity-75
                 ${className}

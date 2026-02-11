@@ -2,10 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import EditCommentDialog from "@/app/(Modules)/_Comments/Components/EditCommentDialog";
 import { PencilIcon, Trash } from "lucide-react";
 import { useDeleteComment } from "../Hooks/useDeleteComment";
 import { toast } from "react-toastify";
+import { useEditCommentDialog } from "../Context/EditCommentDialogContext";
 
 interface IComments {
   id: number;
@@ -24,12 +24,6 @@ interface ListOfCommentsProps {
 const ListOfComments = ({ comments, userId }: ListOfCommentsProps) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [selectedComment, setSelectedComment] = useState({
-    id: 0,
-    text: "",
-    articleId: 0,
-  });
 const { mutate: deleteComment } = useDeleteComment(() => {
   router.refresh();
   toast.success("Comment deleted successfully");
@@ -49,51 +43,50 @@ deleteComment({ id });
     }
   };
 
-  const handleEditComment = (id: number, articleId: number, text: string) => {
-    setSelectedComment({ id, text, articleId });
-    setOpen(true);
-  };
+ const { openDialog: openEditCommentDialog } = useEditCommentDialog();
+ const handleEditComment = (id: number, text: string) => {
+   openEditCommentDialog(id, text);
+ };
+
 
   return (
     <div>
-      <EditCommentDialog
-        id={selectedComment.id}
-        open={open}
-        setOpen={setOpen}
-        text={selectedComment.text}
-      />
       {comments.map((c: IComments) => {
         return (
           <div key={c.id} className="flex justify-between items-center mt-3">
             <div className="bg-gray-300 dark:bg-gray-700 p-4 rounded-lg w-full mr-4">
-              <h3 className="font-semibold mb-1">
-                {c.user.username ? c.user.username : c.user.name}
-              </h3>
-              <p className="text-gray-500 mb-1.5">{c.text}</p>
-            </div>
-            <div className="flex flex-col gap-2">
-              {userId === c.userId && (
-                <>
-                  {loading ? (
-                    <span className="text-sm text-gray-500">Deleting...</span>
-                  ) : (
+              <div className="flex justify-between items-center">
+                <h3 className="font-semibold mb-1"></h3>
+
+                <div>
+                  {userId === c.userId && (
                     <>
-                      <Trash
-                        onClick={() => handleDeleteComment(c.id)}
-                        className="text-red-600 cursor-pointer hover:text-red-700 transition-colors"
-                        size={20}
-                      />
-                      <PencilIcon
-                        onClick={() =>
-                          handleEditComment(c.id, c.articleId, c.text)
-                        }
-                        className="text-green-400 cursor-pointer hover:text-green-500 transition-colors"
-                        size={20}
-                      />
+                      {loading ? (
+                        <span className="text-sm text-gray-500">
+                          Deleting...
+                        </span>
+                      ) : (
+                        <div className="flex gap-5">
+                          <Trash
+                            onClick={() => handleDeleteComment(c.id)}
+                            className="text-red-600 cursor-pointer hover:text-red-700 transition-colors"
+                            size={20}
+                          />
+                          <PencilIcon
+                            onClick={() => handleEditComment(c.id, c.text)}
+                            className="text-green-400 cursor-pointer hover:text-green-500 transition-colors"
+                            size={20}
+                          />
+                        </div>
+                      )}
                     </>
                   )}
-                </>
-              )}
+                </div>
+              </div>
+              {c.user.username ? c.user.username : c.user.name}
+              <p className="text-gray-500 mb-1.5">{c.text}</p>
+
+              <div className="flex flex-col gap-2"></div>
             </div>
           </div>
         );

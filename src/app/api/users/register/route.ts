@@ -77,11 +77,7 @@ export async function POST(request: NextRequest) {
     // Generate verification token
     const verificationToken = await generateVerificationToken(email);
     
-    // ADD THESE DEBUG LOGS
-    console.log("🔍 Full verification token object:", verificationToken);
-    console.log("🔍 Token ID:", verificationToken.id);
-    console.log("🔍 Token value:", verificationToken.token);
-    console.log("🔍 What we're sending in email:", verificationToken.token);
+
 
     // Send verification email
     const emailResult = await sendVerificationEmail(
@@ -99,8 +95,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log("✅ User registered successfully:", newUser.email);
-    console.log("📧 Verification link should contain token:", verificationToken.token);
 
     return NextResponse.json(
       { 

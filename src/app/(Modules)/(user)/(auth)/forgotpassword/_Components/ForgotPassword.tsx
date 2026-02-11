@@ -6,8 +6,8 @@ import { Form } from "@/app/_Components/ui/form";
 import { Button } from "@/app/_Components/ui/button";
 import Link from "next/link";
 import ForgotPassword, { ForgotPasswordType } from "../validations/forgotPassword";
-import forgotPassword from "../Action/Forgotpassword";
 import { toast } from "react-toastify";
+import forgotPassword from "../Action/ForgotPassword";
 
 const ForgotPasswordComponent = () => {
     const form = useForm<ForgotPasswordType>({
@@ -17,7 +17,6 @@ const ForgotPasswordComponent = () => {
     })
 
     const handleSubmitForgot = async (data:ForgotPasswordType) => {
-        console.log("Hi I am clicked ._.");
         try {
             
 const res=await forgotPassword(data)

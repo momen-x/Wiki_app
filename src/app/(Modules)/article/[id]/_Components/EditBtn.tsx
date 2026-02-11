@@ -1,27 +1,26 @@
 "use client"
 import { Button } from '@/app/_Components/ui/button';
-import React, { useState } from 'react'
-import EditArticleDialog from './EditArticleDialog';
+import { useEditArticleDialog } from '../../Context/EditArticleDialogContext';
 
-const EditBtn = ({article}:{article:any}) => {
-      const [open, setOpen] = useState(false);
+const EditBtn = ({article}:{article:{title:string,description:string,id:string|number,userId:number}}) => {
+
+      
+       const { openDialog } = useEditArticleDialog();
+
+         const handleEdit = () => {
+    if (article) {
+      openDialog(article.id, article.title, article.description, article.userId);
+    }
+  };
+
   return (
     <div>
-          <EditArticleDialog
-        id={article.id}
-        userId={article.userId}
-open={open}
-        setOpen={setOpen}
-        title={article.title}
-        description={article.description}
-      />
+  
             <Button
                 variant="default"
                 color="primary"
                 style={{ margin: "0 6px", width: "100px" }}
-                onClick={() => {
-                  setOpen(true);
-                }}
+              onClick={handleEdit}
               >
                 Edit
               </Button>

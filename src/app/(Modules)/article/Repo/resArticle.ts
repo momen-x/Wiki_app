@@ -18,6 +18,8 @@ const ArticleApi:Article={
         userId: Number(data.userId),
       };
 
+    
+
       await axios.post(URL, body);
    
       
@@ -29,6 +31,7 @@ const ArticleApi:Article={
     ,
     editArticle:async (id:string|number,data:UpdateArticleSchemaType)=>{
 try {
+
   await axios.put(`${URL}/${id}`,data);
   
   } catch (error) {

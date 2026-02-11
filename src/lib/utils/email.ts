@@ -53,7 +53,6 @@ export const sendVerificationEmail = async (
       return { success: false, error: error.message };
     }
 
-    console.log("✅ Verification email sent:", data);
     return { success: true };
   } catch (error) {
     console.error("❌ Email sending failed:", error);
@@ -112,7 +111,6 @@ export const sendResendPasswordToken = async (
       return { success: false, error: error.message };
     }
 
-    console.log("✅ Verification email sent:", data);
     return { success: true };
   } catch (error) {
     console.error("❌ Email sending failed:", error);

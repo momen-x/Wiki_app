@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { domain_name } from "../../../../utils/Domain";
 import { useRouter } from "next/navigation";
 import DeleteAccountDialog from "./DeleteAccountDialog";
 import { useForm } from "react-hook-form";
@@ -9,10 +8,11 @@ import  {UpdateUserSchema, UpdateUserSchemaType } from "../_Validations/UpdateUs
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/app/_Components/ui/form";
 import ValidationInput from "@/app/_Components/Inputs/ValidationInput";
-import { LockIcon, Mail, User, Shield, AlertTriangle } from "lucide-react";
+import { LockIcon, User, Shield, AlertTriangle } from "lucide-react";
 import { Button } from "@/app/_Components/ui/button";
 import DialogEditPasswordAccount from "./DialogEditPasswordAccount";
 import { toast } from "react-toastify";
+import { domain_name } from "@/app/utils/Domain";
 
 interface UserData {
   username: string;
@@ -42,8 +42,9 @@ const EditAccountInformation = ({ id }: { id: string }) => {
   };
 
   const handleUpdateAccount = async (data: UpdateUserSchemaType) => {
+    setIsLoading(true);
     try {
-      const response = await axios.put(
+      await axios.put(
         `${domain_name}/api/users/profile/${id}`,
         {
           username:
@@ -51,21 +52,24 @@ const EditAccountInformation = ({ id }: { id: string }) => {
         },
         { withCredentials: true },
       );
-      toast.success("the username updated successfully");
-  
+      toast.success(
+        "the username updated successfully , reload the page to update",
+      );
+      setOriginalData((prev) => ({ ...prev, username: data.username ?? "" }));
     } catch (error: any) {
-      const message = error.response?.data?.message || "Failed to update profile";
+      const message =
+        error.response?.data?.message || "Failed to update profile";
       toast.error(message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const fetchUserData = async () => {
+    setIsLoading(true);
     try {
       const response = await axios.get(
         `${domain_name}/api/users/profile/${id}`,
-        {
-          withCredentials: true,
-        },
       );
       const data = {
         username: response.data.message.username,
@@ -87,16 +91,7 @@ const EditAccountInformation = ({ id }: { id: string }) => {
     fetchUserData();
   }, [id]);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-          <p className="text-gray-600">Loading profile...</p>
-        </div>
-      </div>
-    );
-  }
+
 
 
 

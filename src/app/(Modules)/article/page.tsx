@@ -81,7 +81,10 @@ const session=await auth();
           <CreateArticle id={session.user.id} />
         </>
       ) : (
+        <div className="w-[58vw] m-auto">
+
         <NotAuthUser message="Please log in to add a new article." />
+        </div>
       )}
       {/* Articles List - Server Component */}
       <Suspense

@@ -74,10 +74,8 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
-    const session =await auth();
-
-    // Check if user is not authenticated
-    if (!session) {
+const authSes= await auth();
+    if (!authSes) {
       return NextResponse.json(
         { message: "Unauthorized: Please log in" },
         { status: 401 }
@@ -85,7 +83,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if user is not admin
-    if (!session.user.isAdmin) {
+    if (!authSes.user.isAdmin) {
       return NextResponse.json(
         { message: "Access denied: Only admins can view all comments" },
         { status: 403 }

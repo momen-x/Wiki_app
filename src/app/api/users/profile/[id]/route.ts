@@ -99,7 +99,6 @@ export async function PUT(request: NextRequest, { params }: IProps) {
     }
 
     const body = await request.json();
-    console.log("Request body:", body);
 
     // Prepare data object for update
     const updateData: any = {};
@@ -140,7 +139,6 @@ export async function PUT(request: NextRequest, { params }: IProps) {
     // Check if user wants to update username
     const usernameValidation = UpdateUserSchema.safeParse(body);
     if (usernameValidation.success && body.username) {
-      console.log("Processing username update");
       
       // Only check uniqueness if username is actually changing
       if (body.username !== user.username) {

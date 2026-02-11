@@ -4,7 +4,7 @@ import Image from "next/image";
 import wikiLogo from "@/app/images/wikiLogo.png";
 import { MobileMenu } from "@/app/_Components/Shared/MobileMenu";
 import { AuthButtons } from "@/app/_Components/Shared/AuthButtons";
-import { ModeToggleBtn } from "../../(Modules)/_Theme/components/ToggeleModBtn";
+import { ModeToggleBtn } from "../../(Modules)/_Theme/components/ToggleModBtn";
 import { HomeIcon, Info, LayoutDashboard, Newspaper } from "lucide-react";
 import auth from "@/auth";
 
@@ -24,7 +24,7 @@ const Header = async () => {
   const pages = [...basePages];
   // verification
   const session = await auth();
-  const isAdmin = false;
+  const isAdmin = session?.user.isAdmin;
 
   if (isAdmin) {
     if (!pages.some((p) => p.name === "Admin Dashboard")) {

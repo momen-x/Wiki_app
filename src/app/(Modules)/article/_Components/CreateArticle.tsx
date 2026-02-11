@@ -79,12 +79,13 @@ const CreateArticle = ({ id }: { id: string | number }) => {
                   />
                 </div>
 
-                <div>
+                <div >
                   <ValidationTextArea<CreateArticleSchemaType>
                     fieldTitle="Article Description"
                     nameInSchema="description"
                     placeholder="Enter article description"
-                    className="min-h-30 w-full"
+                    // className="w-full"
+                    style={{ width:"50vw",display:"block" ,resize:"none",height:"150px" }}
                   />
                 </div>
 

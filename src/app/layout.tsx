@@ -8,6 +8,8 @@ import Header from "./_Components/Shared/Header";
 import Footer from "./_Components/Shared/Footer";
 import ReactQueryProviders from "./_Providers/ReactQueryProvider";
 import ToasterProvider from "./_Providers/ToastProvider";
+import { EditArticleProviders } from "./_Providers/EditArticleProvider";
+import EditCommentDialogContextProvider from "./(Modules)/_Comments/Context/EditCommentDialogContext";
 
 
 
@@ -36,9 +38,11 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ReactQueryProviders>
-            <ToasterProvider/>
+            <ToasterProvider />
             <Header />
-            {children}
+            <EditCommentDialogContextProvider>
+              <EditArticleProviders>{children}</EditArticleProviders>
+            </EditCommentDialogContextProvider>
             <Footer />
           </ReactQueryProviders>
         </ThemeProvider>

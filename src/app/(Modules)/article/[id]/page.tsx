@@ -52,17 +52,15 @@ const DynamicPage = async ({ params }: IParams) => {
     const userData = await userinfo.json();
     if (userData.message.username) {
       username = userData.message.username;
-    }
-   else if (userData.message.name) {
+    } else if (userData.message.name) {
       username = userData.message.name;
     }
 
     if (!article?.title) return <NotFound />;
-    if (!session?.user?.id) {
-      return (
-        <NotAuthUser message="Please log in to add a comment on this article." />
-      );
-    }
+    // if (!session?.user?.id) {
+    //   return (
+    //   );
+    // }
 
     return (
       <div className="min-h-screen  py-12 px-4 sm:px-6 lg:px-8">
@@ -131,10 +129,14 @@ const DynamicPage = async ({ params }: IParams) => {
                     <AddCommentInputs id={String(id)} />
                   </>
                 )}
-                <ListOfComments
-                  comments={article.comments || ([] as IComments[])}
-                  userId={+session.user?.id}
-                />
+                {session?.user?.id ? (
+                  <ListOfComments
+                    comments={article.comments || ([] as IComments[])}
+                    userId={Number(session.user?.id)}
+                  />
+                ) : (
+                  <NotAuthUser message="Please log in to add a comment on this article." />
+                )}
               </div>
             </div>
           </div>

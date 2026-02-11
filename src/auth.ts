@@ -12,12 +12,17 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
   callbacks: {
     ...authConfig.callbacks,
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
         token.name = user.name;
         token.username = user.username;
         token.isAdmin = user.isAdmin ?? false;
+      }
+      //to update the session after the user update his username
+      if (trigger === "update" && session) {
+        token.name = session.name;
+        token.username = session.username;
       }
       return token;
     },
@@ -25,9 +30,14 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
-        session.user.name = token.name as string;
-        session.user.username = token.username as string;
-        session.user.isAdmin = (token.isAdmin as boolean) ?? false;
+        const user = await prisma.user.findUnique({
+          where: { id: +(token.id as string) },
+        });
+        if (user) {
+          session.user.name = user.name;
+          session.user.username = user.username;
+          session.user.isAdmin = user.isAdmin;
+        }
       }
       return session;
     },
@@ -49,7 +59,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
       // Block login if email not verified
       if (!userFromDb?.emailVerified) {
-        console.log("❌ Login blocked: Email not verified for", user.email);
+        // console.log("❌ Login blocked: Email not verified for", user.email);
         return false; // This will show an error to the user
       }
 
